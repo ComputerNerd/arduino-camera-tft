@@ -324,7 +324,7 @@ const struct regval_list ov7670_default_regs[] PROGMEM = {
 	/* Mystery scaling numbers */
 	{ 0x70, 0x3a },		{ 0x71, 0x35 },
 	{ 0x72, 0x11 },		{ 0x73, 0xf0 },
-	{ 0xa2, 0x02 },		{ REG_COM10, 0x0 },
+	{ 0xa2,/* 0x02 changed to 1*/1},{ REG_COM10, 0x0 },
 
 	/* Gamma curve values */
 	{ 0x7a, 0x20 },		{ 0x7b, 0x10 },
@@ -350,6 +350,8 @@ const struct regval_list ov7670_default_regs[] PROGMEM = {
 	{ REG_HAECC5, 0xf0 },	{ REG_HAECC6, 0x90 },
 	{ REG_HAECC7, 0x94 },
 	{ REG_COM8, COM8_FASTAEC|COM8_AECSTEP|COM8_BFILT|COM8_AGC|COM8_AEC },
+
+        {0x30,0},{0x31,0},//disable some delays
 
 	/* Almost all of these are magic "reserved" values.  */
 	{ REG_COM5, 0x61 },	{ REG_COM6, 0x4b },
@@ -395,7 +397,7 @@ const struct regval_list ov7670_default_regs[] PROGMEM = {
 	{ 0x56, 0x40 },
 
 	{ 0x34, 0x11 },		{ REG_COM11, COM11_EXP|COM11_HZAUTO },
-	{ 0xa4, 0x88 },		{ 0x96, 0 },
+	{ 0xa4, 0x82/*Wax0x88*/ },		{ 0x96, 0 },
 	{ 0x97, 0x30 },		{ 0x98, 0x20 },
 	{ 0x99, 0x30 },		{ 0x9a, 0x84 },
 	{ 0x9b, 0x29 },		{ 0x9c, 0x03 },
