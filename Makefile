@@ -85,7 +85,7 @@ PROJECTNAME=cameratft
 # (list all files to compile, e.g. 'a.c b.cpp as.S'):
 # Use .cc, .cpp or .C suffix for C++ files, use .S 
 # (NOT .s !!!) for assembly source code files.
-PRJSRC=main.c font.c twicam.c drawgui.c TFT.c TouchScreen.c captureimage.c gammaedit.c
+PRJSRC=main.c font.c twicam.c drawgui.c TFT.c TouchScreen.c captureimage.c gammaedit.c selections.c
 
 # additional includes (e.g. -I/path/to/mydir)
 INC=
@@ -137,7 +137,7 @@ AVRDUDE_PORT=/dev/ttyACM0
 HEXFORMAT=ihex
 
 # compiler
-CFLAGS= -I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
+CFLAGS=-pipe -I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
 	-Wall -Wstrict-prototypes               \
