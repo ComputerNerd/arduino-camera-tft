@@ -14,11 +14,119 @@
 #define YUV2R(Y, U, V) CLIP(( 298 * C(Y)              + 409 * E(V) + 128) >> 8)
 #define YUV2G(Y, U, V) CLIP(( 298 * C(Y) - 100 * D(U) - 208 * E(V) + 128) >> 8)
 #define YUV2B(Y, U, V) CLIP(( 298 * C(Y) + 516 * D(U)              + 128) >> 8)
+uint8_t buf[1280];
+void capImgqqvga(uint8_t offsetx)
+{
+	cli();
+	uint8_t w,ww;
+	uint8_t h;
+	uint8_t y=0;
+	w=160;
+	h=120;
+    DDRA=0xFF;
+    DDRC=0;
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){}//wait for low
+	while (h--){
+		PORTG^=(1<<5);
+		/*ww=w;
+		while (ww--){
+			WR_LOW;
+			PORTA=0;
+			WR_HIGH;
+			WR_LOW;
+			PORTA=0;
+			WR_HIGH;
+		}*/
+		tft_setXY(y,offsetx);
+		++y;
+		CS_LOW;
+		RS_HIGH;
+		RD_HIGH;
+		ww=w;
+		while (ww--){
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			//while (!(PINE&16)){}//wait for high
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			//while (!(PINE&16)){}//wait for high
+		}
+	}
+	CS_HIGH;
+	sei();
+}
+void capImghq(void)
+{
+	cli();
+	uint16_t w,ww;
+	uint8_t h;
+	w=320;
+	h=240;
+	tft_setXY(0,0);
+	CS_LOW;
+    RS_HIGH;
+    RD_HIGH;
+    DDRA=0xFF;
+    DDRC=0;
+   	uint8_t *line,*line2;
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){}//wait for low
+	//while (!(PINE&16)){}//wait for high
+	while (h--){
+		PORTG^=(1<<5);
+		ww=w;
+		line=buf;
+		while (ww--){
+			while (PINE&16){}//wait for low
+			*line++=(PINC>>3)&31;//blue
+			while (!(PINE&16)){}//wait for high
+			while (PINE&16){}//wait for low
+			*line++=PINC;//green
+			while (!(PINE&16)){}//wait for high
+		}
+		line2=buf+1;
+		ww=w;
+		while (ww--){
+			while (PINE&16){}//wait for low
+			*line++=(PINC+*line2)>>3;//green
+			line2+=2;
+			while (!(PINE&16)){}//wait for high
+			while (PINE&16){}//wait for low
+			*line++=PINC&248;//red
+			while (!(PINE&16)){}//wait for high
+		}
+		line=buf;
+		line2=buf+640;
+		/* B G
+		   G R*/
+		ww=w;
+		while (ww--){
+			//r r r r r g g g   g g g b b b b b
+			// 0 0 g g g g g g
+			WR_LOW;
+			PORTA=line2[1]|((*line2)>>3);
+			WR_HIGH;
+			WR_LOW;
+			PORTA=*line|((*line2)<<5);
+			WR_HIGH;
+			line+=2;   
+			line2+=2;
+		}
+	}
+	CS_HIGH;
+	sei();
+}
 void capImg(void)
 {
 	cli();
 	uint16_t w,ww;
 	uint8_t h;
+
 	w=640;
 	h=240;
 	tft_setXY(0,0);
@@ -29,17 +137,17 @@ void capImg(void)
     DDRC=0;
 	while (!(PINE&32)){}//wait for high
 	while (PINE&32){}//wait for low
-	while (h--)
-	{
+	while (h--){
+		PORTG^=(1<<5);
 		ww=w;
-		while (ww--)
-		{
+		while (ww--){
 			WR_LOW;
 			while (PINE&16){}//wait for low
 			PORTA=PINC;
 			WR_HIGH;
 			while (!(PINE&16)){}//wait for high
 		}
+
 	}
 	#ifndef rgb565
 	sei();

@@ -1,6 +1,10 @@
 #define F_CPU 16000000UL  // 16 MHz
-#define qvga
-#define rgb565
+#define vga 0
+#define qvga 1
+#define qqvga 2
+#define yuv422 0
+#define rgb565 1
+#define bayerRGB 2
 //#define yuv422
 //#define MT9D111
 #ifdef MT9D111

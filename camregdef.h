@@ -167,6 +167,7 @@ at */
 #define   COM13_GAMMA	  0x80	  /* Gamma enable */
 #define	  COM13_UVSAT	  0x40	  /* UV saturation auto adjustment */
 #define   COM13_UVSWAP	  0x01	  /* V before U - w/TSLB */
+#define COM13_RSVD 0x08
 #define REG_COM14	0x3e	/* Control 14 */
 #define   COM14_DCWEN	  0x10	  /* DCW/PCLK-scale enable */
 #define REG_EDGE	0x3f	/* Edge enhancement factor */

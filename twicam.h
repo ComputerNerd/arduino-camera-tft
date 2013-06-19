@@ -10,5 +10,6 @@ struct regval_list {
 	uint8_t reg_num;
 	uint8_t value;
 };
+void setRes(uint8_t res);
 void wrSensorRegs8_8(const struct regval_list reglist[]);
 #endif

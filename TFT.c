@@ -4,6 +4,7 @@
 #include <util/delay.h>
 #include <stdint.h>
 #include <avr/pgmspace.h>
+#include <math.h>
 static uint8_t DisplayDirect;
 
 inline void tft_all_pin_input(void)
@@ -49,6 +50,13 @@ inline void tft_pushData(unsigned char data)
 }
 inline void tft_sendCommand(unsigned int index)
 {
+	#ifdef MEGA
+		DDRA=0xFF;
+		PORTA=0;
+	#else
+		tft_all_pin_output();
+		tft_all_pin_low();
+	#endif
     CS_LOW;
     RS_LOW;
     RD_HIGH;
@@ -149,6 +157,16 @@ void tft_setDisplayDirect(unsigned char Direction)
 {
   DisplayDirect = Direction;
 }
+void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color)
+{
+	tft_setXY(poX,poY);
+	tft_setOrientation(1);
+	if(length+poY>MAX_Y)
+		length=MAX_Y-poY;
+	uint16_t i;
+	for(i=0;i<length;++i)
+		tft_sendData(color);
+}
 void tft_drawHorizontalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color)
 {
     tft_setXY(poX,poY);
@@ -158,6 +176,31 @@ void tft_drawHorizontalLine(unsigned int poX, unsigned int poY,unsigned int leng
     uint16_t i;
 	for(i=0;i<length;i++)
 		tft_sendData(color);
+}
+inline void tft_setPixel(unsigned int poX, unsigned int poY,unsigned int color)
+{
+	tft_setXY(poX,poY);
+	tft_sendData(color);
+}
+void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,unsigned int color)
+{
+    int x = x1-x0;
+    int y = y1-y0;
+    int dx = abs(x), sx = x0<x1 ? 1 : -1;
+    int dy = -abs(y), sy = y0<y1 ? 1 : -1;
+    int err = dx+dy, e2; /* error value e_xy */
+    for (;;){ /* loop */
+        tft_setPixel(x0,y0,color);
+        e2 = 2*err;
+        if (e2 >= dy) { /* e_xy+e_x > 0 */
+            if (x0 == x1) break;
+            err += dy; x0 += sx;
+        }
+        if (e2 <= dx) { /* e_xy+e_y < 0 */
+            if (y0 == y1) break;
+            err += dx; y0 += sy;
+        }
+    }
 }
 void tft_fillRectangle(unsigned int poX, unsigned int poY, unsigned int length, unsigned int width, unsigned int color)
 {
