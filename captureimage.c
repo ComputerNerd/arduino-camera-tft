@@ -28,16 +28,6 @@ void capImgqqvga(uint8_t offsetx)
 	while (!(PINE&32)){}//wait for high
 	while (PINE&32){}//wait for low
 	while (h--){
-		PORTG^=(1<<5);
-		/*ww=w;
-		while (ww--){
-			WR_LOW;
-			PORTA=0;
-			WR_HIGH;
-			WR_LOW;
-			PORTA=0;
-			WR_HIGH;
-		}*/
 		tft_setXY(y,offsetx);
 		++y;
 		CS_LOW;
@@ -78,7 +68,6 @@ void capImghq(void)
 	while (PINE&32){}//wait for low
 	//while (!(PINE&16)){}//wait for high
 	while (h--){
-		PORTG^=(1<<5);
 		ww=w;
 		line=buf;
 		while (ww--){
@@ -121,24 +110,93 @@ void capImghq(void)
 	CS_HIGH;
 	sei();
 }
+inline void serialWrB(uint8_t dat)
+{
+	UDR0=dat;
+	while ( !( UCSR0A & (1<<UDRE0)) ) {} //wait for byte to transmit
+}
+void capImgPC(void)
+{//sends raw bayer data to serial
+	//this must be divider into two transfers due to lack of ram
+	cli();
+	uint16_t w,ww;
+	uint8_t h;
+	w=640;
+	h=240;
+	tft_setXY(0,0);
+	CS_LOW;
+	RS_HIGH;
+	RD_HIGH;
+	DDRA=0xFF;
+	DDRC=0;
+	serialWrB('R');
+	serialWrB('D');
+	serialWrB('Y');
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){}//wait for low
+	while (h--){
+		ww=w;
+		while(ww--){
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
+		}
+	}
+	for (h=0;h<240;++h){
+		for (ww=0;ww<320;++ww){
+			tft_setXY(h,ww);
+			serialWrB(tft_readRegister(0x22));
+		}
+	}
+	h=240;
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){}//wait for low
+	while (h--){
+		ww=w;
+		while(ww--){
+			while (PINE&16){}//wait for low
+			while (!(PINE&16)){}//wait for high
+		}
+	}
+	h=240;
+	while (h--){
+		ww=w;
+		while(ww--){
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
+		}
+	}
+	for (h=0;h<240;++h){
+		for (ww=0;ww<320;++ww){
+			tft_setXY(h,ww);
+			uint16_t res=tft_readRegister(0x22);
+			serialWrB(res>>8);
+			serialWrB(res&255);
+		}
+	}
+	sei();
+}
 void capImg(void)
 {
 	cli();
 	uint16_t w,ww;
 	uint8_t h;
-
 	w=640;
 	h=240;
 	tft_setXY(0,0);
 	CS_LOW;
-    RS_HIGH;
-    RD_HIGH;
-    DDRA=0xFF;
-    DDRC=0;
+	RS_HIGH;
+	RD_HIGH;
+	DDRA=0xFF;
+	DDRC=0;
 	while (!(PINE&32)){}//wait for high
 	while (PINE&32){}//wait for low
 	while (h--){
-		PORTG^=(1<<5);
 		ww=w;
 		while (ww--){
 			WR_LOW;

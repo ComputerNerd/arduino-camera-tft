@@ -394,8 +394,6 @@ void initCam(uint8_t bayerUse)
 	wrReg(REG_COM11,226);//enable night mode 1/8 frame rate COM11
 	if(bayerUse){
 		wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
-		_delay_ms(200);
-		wrReg(0x11,14);
 	}
 	else{
 		setRes(qvga);

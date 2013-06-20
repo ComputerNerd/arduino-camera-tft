@@ -28,6 +28,11 @@ void main(void)
 	OCR5A = 0;
 	DDRC=0;
 	DDRG|=1<<5;
+	UBRR0H=0;
+	UBRR0L=1;//1= 1m 3 = 0.5M 2M baud rate = 0 7 = 250k 207 is 9600 baud rate
+	UCSR0A|=2;//double speed aysnc
+	UCSR0B = (1<<RXEN0)|(1<<TXEN0);//Enable receiver and transmitter
+	UCSR0C=6;//async 1 stop bit 8bit char no parity bits
 	uint8_t error;
 	tft_init();  //init TFT library
 	tft_setDisplayDirect(DOWN2UP);

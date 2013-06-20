@@ -4,6 +4,7 @@
 #include "camregdef.h"
 #include "config.h"
 #include <avr/pgmspace.h>
+#include <util/delay.h>
 #ifndef MT9D11
 void setmatrix(uint8_t id)
 {
@@ -50,9 +51,11 @@ const char menu4[] PROGMEM = "qqvga preview";
 const char menu5[] PROGMEM = "gamma edit";
 const char menu6[] PROGMEM = "hq capture";
 const char menu7[] PROGMEM = "White balance";
+const char menu8[] PROGMEM = "Image to PC";
 const char *const menu_table[] PROGMEM = {
 	menu0,menu1,menu2,menu3,
-	menu4,menu5,menu6,menu7
+	menu4,menu5,menu6,menu7,
+	menu8
 };
 const char maxtrix0[] PROGMEM = "Maxtrix yuv422";
 const char maxtrix1[] PROGMEM = "Maxtrix 2";
@@ -109,7 +112,7 @@ void menu(void)
 {
 	uint16_t x,y,z;
 	while (1){
-		switch (selection((const char**)menu_table,8)) {
+		switch (selection((const char**)menu_table,9)) {
 			case 0:
 			#ifdef MT9D111
 				editRegs(0);
@@ -133,21 +136,19 @@ void menu(void)
 			initCam(0);
 		break;
 		#ifndef MT9D111
-   case 3:
-   //compare matrixes
-   do {
-        //p = ts.getPoint();//wait for screen to be pressed
-        getPoint(&x,&y,&z);
-        uint8_t a;
-		for (a=0;a<3;a++)
-		{
-			setmatrix(a);
+		case 3:
+			//compare matrixes
 			tft_setOrientation(1);
-			capImg();
+			do {
+				getPoint(&x,&y,&z);
+				uint8_t a;
+				for (a=0;a<3;a++){
+					setmatrix(a);
+					capImg();
+				}
+			}while (z < 10);
 			tft_setDisplayDirect(DOWN2UP);
-		}
-	}while (z < 10);
-	break;
+		break;
 		#endif
 			case 4:
 				setRes(qqvga);
@@ -165,6 +166,8 @@ void menu(void)
 			case 6:
 				initCam(1);
 				setRes(vga);
+				_delay_ms(200);
+				wrReg(0x11,14);
 				do{
 					getPoint(&x,&y,&z);
 					tft_setOrientation(1);
@@ -206,6 +209,18 @@ void menu(void)
 				setColor(rgb565);
 				capImg();
 				tft_setDisplayDirect(DOWN2UP);}
+			break;
+			case 8:
+				initCam(1);
+				_delay_ms(200);
+				wrReg(0x11,2);
+				setRes(vga);
+				tft_setOrientation(1);
+				do{
+					capImgPC();
+					getPoint(&x,&y,&z);
+				}while(z<10);
+				tft_setDisplayDirect(DOWN2UP);
 			break;
 		}
 	}
