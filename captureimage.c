@@ -115,10 +115,59 @@ inline void serialWrB(uint8_t dat)
 	UDR0=dat;
 	while ( !( UCSR0A & (1<<UDRE0)) ) {} //wait for byte to transmit
 }
-void capImgPC(void)
-{//sends raw bayer data to serial
-	//this must be divider into two transfers due to lack of ram
+void capImgOff(uint16_t off)
+{
+	tft_setXY(0,0);
+	CS_LOW;
+	RS_HIGH;
+	RD_HIGH;
+	DDRA=0xFF;
+	DDRC=0;
+	uint16_t w,ww;
+	uint8_t h;
+	w=1280;
+	h=120;
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){}//wait for low
+	if(off!=0){
+			while (off--){
+			ww=w;
+			while(ww--){
+				while (PINE&16){}//wait for low
+				while (!(PINE&16)){}//wait for high
+			}
+		}
+	}
+	while (h--){
+		ww=w;
+		while(ww--){
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
+		}
+	}
+}
+void transBuffer(void)
+{
+	uint16_t w;
+	uint8_t h;
+	for (h=0;h<240;++h){
+		for (w=0;w<320;++w){
+			tft_setXY(h,w);
+			uint16_t res=tft_readRegister(0x22);
+			serialWrB(res>>8);
+			serialWrB(res&255);
+		}
+	}
+}
+void capImgPCqvga(void)
+{
 	cli();
+	serialWrB('R');
+	serialWrB('D');
+	serialWrB('Y');
 	uint16_t w,ww;
 	uint8_t h;
 	w=640;
@@ -129,56 +178,36 @@ void capImgPC(void)
 	RD_HIGH;
 	DDRA=0xFF;
 	DDRC=0;
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){}//wait for low
+	while (h--){
+		ww=w;
+		while (ww--){
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
+		}
+
+	}
+	transBuffer();
+}
+void capImgPC(void)
+{//sends raw bayer data to serial
+	//this must be divider into two transfers due to lack of ram
+	cli();
 	serialWrB('R');
 	serialWrB('D');
 	serialWrB('Y');
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
-	while (h--){
-		ww=w;
-		while(ww--){
-			WR_LOW;
-			while (PINE&16){}//wait for low
-			PORTA=PINC;
-			WR_HIGH;
-			while (!(PINE&16)){}//wait for high
-		}
-	}
-	for (h=0;h<240;++h){
-		for (ww=0;ww<320;++ww){
-			tft_setXY(h,ww);
-			serialWrB(tft_readRegister(0x22));
-		}
-	}
-	h=240;
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
-	while (h--){
-		ww=w;
-		while(ww--){
-			while (PINE&16){}//wait for low
-			while (!(PINE&16)){}//wait for high
-		}
-	}
-	h=240;
-	while (h--){
-		ww=w;
-		while(ww--){
-			WR_LOW;
-			while (PINE&16){}//wait for low
-			PORTA=PINC;
-			WR_HIGH;
-			while (!(PINE&16)){}//wait for high
-		}
-	}
-	for (h=0;h<240;++h){
-		for (ww=0;ww<320;++ww){
-			tft_setXY(h,ww);
-			uint16_t res=tft_readRegister(0x22);
-			serialWrB(res>>8);
-			serialWrB(res&255);
-		}
-	}
+	capImgOff(0);
+	transBuffer();
+	capImgOff(120);
+	transBuffer();
+	capImgOff(240);
+	transBuffer();
+	capImgOff(360);
+	transBuffer();
 	sei();
 }
 void capImg(void)

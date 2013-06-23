@@ -392,12 +392,7 @@ void initCam(uint8_t bayerUse)
 	wrReg(0x1e,33);//hflip
 	wrReg(REG_COM10,32);//pclk does not toggle on HBLANK
 	wrReg(REG_COM11,226);//enable night mode 1/8 frame rate COM11
-	if(bayerUse){
+	if(bayerUse)
 		wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
-	}
-	else{
-		setRes(qvga);
-		setColor(rgb565);
-	}
 #endif
 }

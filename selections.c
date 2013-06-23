@@ -69,6 +69,9 @@ const char wb4[] PROGMEM="Cloudy";
 const char wb5[] PROGMEM="Office";
 const char wb6[] PROGMEM="Home";
 const char *const wb_table[] PROGMEM={wb0,wb1,wb2,wb3,wb4,wb5,wb6};
+const char res0[] PROGMEM="VGA";
+const char res1[] PROGMEM="QVGA";
+const char *const res_tab[] PROGMEM={res0,res1};
 uint8_t selection(const char ** table,uint8_t maxitems)
 {
 	uint8_t item;
@@ -151,6 +154,7 @@ void menu(void)
 		break;
 		#endif
 			case 4:
+				setColor(rgb565);
 				setRes(qqvga);
 				do{
 					getPoint(&x,&y,&z);
@@ -161,6 +165,7 @@ void menu(void)
 				setRes(qvga);
 			break;
 			case 5:
+				setColor(rgb565);
 				gammaEdit();
 			break;
 			case 6:
@@ -211,16 +216,29 @@ void menu(void)
 				tft_setDisplayDirect(DOWN2UP);}
 			break;
 			case 8:
-				initCam(1);
+				/*initCam(0);
 				_delay_ms(200);
-				wrReg(0x11,2);
-				setRes(vga);
+				wrReg(0x11,2);*/
+				{uint8_t reso=selection((const char**)res_tab,2);
+				if(reso)
+					setRes(qvga);
+				else
+					setRes(vga);
+				setColor(yuv422);
+				_delay_ms(200);
+				if(reso)
+					wrReg(0x11,1);
+				else
+					wrReg(0x11,3);
 				tft_setOrientation(1);
 				do{
-					capImgPC();
+					if(reso)
+						capImgPCqvga();
+					else
+						capImgPC();
 					getPoint(&x,&y,&z);
 				}while(z<10);
-				tft_setDisplayDirect(DOWN2UP);
+				tft_setDisplayDirect(DOWN2UP);}
 			break;
 		}
 	}
