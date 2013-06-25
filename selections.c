@@ -111,6 +111,14 @@ uint8_t selection(const char ** table,uint8_t maxitems)
 	tft_paintScreenBlack();
 	return item;
 }
+const char config0[] PROGMEM = "Linux driver";
+const char config1[] PROGMEM = "suwa-koubou";
+const char config2[] PROGMEM = "Arducam";
+const char *const config_tab[] PROGMEM = {config0,config1,config2};
+void configSel(void)
+{
+	initCam(selection((const char**)config_tab,3));
+}
 void menu(void)
 {
 	uint16_t x,y,z;

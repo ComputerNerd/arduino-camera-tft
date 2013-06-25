@@ -45,8 +45,9 @@ void main(void)
 	cli();
 	TWSR&=~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
-	initCam(0);
-	tft_drawStringP(PSTR("Starting"),120,300,4,WHITE);
+	//initCam(0);
+	configSel();
+	//tft_drawStringP(PSTR("Starting"),120,300,4,WHITE);
 	menu();
 }
 
