@@ -110,11 +110,11 @@ void editRegs(void)
 	#else
 		val=rdReg(address);
 	#endif
-  #ifdef MT9D111
-  redrawT(address,val,microedit,maddr,bitm8);
-  #else
-  redrawT(address,val);
-  #endif
+	#ifdef MT9D111
+		redrawT(address,val,microedit,maddr,bitm8);
+	#else
+		redrawT(address,val);
+	#endif
 	while (1){
 		getPoint(&x,&y,&z);
 		if (z > 10){
@@ -133,8 +133,7 @@ void editRegs(void)
 				#endif
 				val=rdReg(address);
 				redrawT(address,val);
-			}
-			else if (x >= 188 && x <= 212 && y >= 224)
+			}else if (x >= 188 && x <= 212 && y >= 224)
 				return;
 			else if (x >= 188 && x <= 212 && y <= 232 && y >= 136){
 				#ifdef MT9D111
@@ -161,62 +160,56 @@ void editRegs(void)
 				#endif
 				val=rdReg(address);
 				redrawT(address,val);
+			}else if (x >= 80 && x <= 112 && y > 64){
+				uint8_t off=(y-64)/32;
+				off=1<<off;
+				val^=off;
+				wrReg(address,val);
+				val=rdReg(address);
+				redrawT(address,val);
 			}
-    else if (x >= 80 && x <= 112 && y > 64){
-      uint8_t off=(y-64)/32;
-      off=1<<off;
-      val^=off;
-      wrReg(address,val);
-      val=rdReg(address);
-      redrawT(address,val);
-    }
-    else if (x >= 126 && x <= 156){
-     //change register value
-     if (y <= 256 && y >= 224){
-        val++;
-        wrReg(address,val);
-        val=rdReg(address);
-        redrawT(address,val);
-      }
-      else if (y <= 224 && y >= 192){
-        val--;
-        wrReg(address,val);
-        val=rdReg(address);
-        redrawT(address,val);
-      }
-      else if (y <= 160 && y >= 136){
-        val+=16;
-        wrReg(address,val);
-        val=rdReg(address);
-        redrawT(address,val);
-      }
-      else if (y <= 112 && y >= 88){
-        val-=16;
-        wrReg(address,val);
-        val=rdReg(address);
-        redrawT(address,val);
-      }
-    }
-    else if (x >= 156 && x <= 188){
-      if (y <= 256 && y >= 224){
-        ++address;
-        val=rdReg(address);
-        redrawT(address,val);
-      }
-      else if (y <= 224 && y >= 192){
-        --address;
-        val=rdReg(address);
-        redrawT(address,val);
-      }
-    }
-  }
-  uint8_t val2=rdReg(address);
-  if (val2 != val){
-   val=val2;
-   redrawT(address,val);
-  }
-  }//end of loop
-   //tft_paintScreenBlack();
+			else if (x >= 126 && x <= 156){
+				//change register value
+				if (y <= 256 && y >= 224){
+					val++;
+					wrReg(address,val);
+					val=rdReg(address);
+					redrawT(address,val);
+				}else if (y <= 224 && y >= 192){
+					val--;
+					wrReg(address,val);
+					val=rdReg(address);
+					redrawT(address,val);
+				}else if (y <= 160 && y >= 136){
+					val+=16;
+					wrReg(address,val);
+					val=rdReg(address);
+					redrawT(address,val);
+				}else if (y <= 112 && y >= 88){
+					val-=16;
+					wrReg(address,val);
+					val=rdReg(address);
+					redrawT(address,val);
+				}
+			}else if (x >= 156 && x <= 188){
+				if (y <= 256 && y >= 224){
+					++address;
+					val=rdReg(address);
+					redrawT(address,val);
+				}else if (y <= 224 && y >= 192){
+					--address;
+					val=rdReg(address);
+					redrawT(address,val);
+				}
+			}
+		}
+		uint8_t val2=rdReg(address);
+		if (val2 != val){
+			val=val2;
+			redrawT(address,val);
+		}
+	}//end of loop
+	//tft_paintScreenBlack();
 }
 uint16_t leadingZeros(uint8_t x)
 {
