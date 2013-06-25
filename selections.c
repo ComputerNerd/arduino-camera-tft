@@ -177,8 +177,9 @@ void menu(void)
 				gammaEdit();
 			break;
 			case 6:
-				initCam(1);
+				//initCam(1);
 				setRes(vga);
+				wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
 				_delay_ms(200);
 				wrReg(0x11,14);
 				do{

@@ -36,12 +36,6 @@ void main(void)
 	uint8_t error;
 	tft_init();  //init TFT library
 	tft_setDisplayDirect(DOWN2UP);
-	#ifdef MT9D111
-		tft_drawStringP(PSTR("MT9D111"),20,240,4,BLUE);
-	#else
-		tft_drawStringP(PSTR("OV7670"),20,240,4,BLUE);
-	#endif
-	tft_drawStringP(PSTR("Test"),60,220,4,RED);
 	cli();
 	TWSR&=~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
