@@ -115,7 +115,7 @@ inline void serialWrB(uint8_t dat)
 	UDR0=dat;
 	while ( !( UCSR0A & (1<<UDRE0)) ) {} //wait for byte to transmit
 }
-void capImgOff(uint16_t off)
+void capImgOff(uint8_t off)
 {
 	tft_setXY(0,0);
 	CS_LOW;
@@ -125,8 +125,8 @@ void capImgOff(uint16_t off)
 	DDRC=0;
 	uint16_t w,ww;
 	uint8_t h;
-	w=1280;
-	h=120;
+	w=640;
+	h=240;
 	while (!(PINE&32)){}//wait for high
 	while (PINE&32){}//wait for low
 	if(off!=0){
@@ -195,18 +195,14 @@ void capImgPCqvga(void)
 }
 void capImgPC(void)
 {//sends raw bayer data to serial
-	//this must be divider into two transfers due to lack of ram
+	//this must be divided into two transfers due to lack of ram
 	cli();
 	serialWrB('R');
 	serialWrB('D');
 	serialWrB('Y');
 	capImgOff(0);
 	transBuffer();
-	capImgOff(120);
-	transBuffer();
 	capImgOff(240);
-	transBuffer();
-	capImgOff(360);
 	transBuffer();
 	sei();
 }

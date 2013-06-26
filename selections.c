@@ -228,17 +228,21 @@ void menu(void)
 				/*initCam(0);
 				_delay_ms(200);
 				wrReg(0x11,2);*/
+				wrReg(0x1e,rdReg(0x1e)&(~(1<<5))&(~(1<<4)));
 				{uint8_t reso=selection((const char**)res_tab,2);
-				if(reso)
+				if(reso){
 					setRes(qvga);
-				else
+					setColor(yuv422);
+					
+				}else{
 					setRes(vga);
-				setColor(yuv422);
+					wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+				}
 				_delay_ms(200);
 				if(reso)
 					wrReg(0x11,1);
 				else
-					wrReg(0x11,3);
+					wrReg(0x11,2);
 				tft_setOrientation(1);
 				do{
 					if(reso)

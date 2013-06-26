@@ -561,8 +561,9 @@ void initCam(uint8_t bayerUse)
 	}
 	else
 		wrSensorRegs8_8(ov7670_default_regs);
-	wrReg(0x1e,33);//hflip
+	if(bayerUse!=2)
+		wrReg(0x1e,rdReg(0x1e)|(1<<5));//hflip
 	wrReg(REG_COM10,32);//pclk does not toggle on HBLANK
-	wrReg(REG_COM11,226);//enable night mode 1/8 frame rate COM11
+	//wrReg(REG_COM11,226);//enable night mode 1/8 frame rate COM11
 #endif
 }
