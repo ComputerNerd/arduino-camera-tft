@@ -25,7 +25,7 @@ void main(void)
 	//generate 8mhz clock
 	TCCR5A =67;
 	TCCR5B=17;
-	OCR5A = 0;
+	OCR5A = 1;// F_CPU/(2*(x+1))
 	DDRC=0;
 	DDRG|=1<<5;
 	UBRR0H=0;
@@ -69,6 +69,8 @@ void redrawT(uint8_t z,uint8_t regD)
 	utoa(regD,(char *)buf,10);
 	tft_drawString((char *)buf,32,320,2,WHITE);
 	#ifdef MT9D111
+		if(micro)
+			
 		utoa(regD>>8,(char *)buf,2);
 		tft_drawString((char *)buf,48,leadingZeros(48),4,WHITE);
 		utoa(regD&255,(char *)buf,2);
@@ -137,7 +139,6 @@ void editRegs(void)
 				tft_setOrientation(1);
 				do {
 					capImg();
-					//p = ts.getPoint();//wait for screen to be pressed
 					getPoint(&x,&y,&z);
 				} while (z < 10);
 				tft_setDisplayDirect(DOWN2UP);
@@ -169,7 +170,6 @@ void editRegs(void)
 					capImg();
 					utoa(stp,(char *)buf,10);
 					tft_drawString((char *)buf,0,320,2,WHITE);
-					//p = ts.getPoint();//wait for screen to be pressed
 					getPoint(&x,&y,&z);
 					++stp;
 				} while (z < 10);

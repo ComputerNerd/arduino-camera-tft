@@ -129,6 +129,29 @@ void wrSensorRegs8_16(const struct regval_list reglist[])
 	   	next++;
 	}
 }
+void wrSensorRegs8_16P(const struct regval_listP reglist[])
+{
+	uint8_t reg_addr;
+	uint16_t reg_val;
+	uint8_t page;
+	const struct regval_listP *next = reglist;
+	while ((reg_addr != 0xFF) | (reg_val != 0xFFFF)){
+		page=pgm_read_byte(&next->page);
+		reg_addr = pgm_read_byte(&next->reg_num);
+		reg_val = pgm_read_word(&next->value);
+		if(page==EX3691_TOK_DELAY){
+			uint8_t l;
+			for(l=0;l<reg_val;++l)
+				_delay_ms(100);
+		}else if(page==EndRegs_MT9D111)
+			break;
+		else{
+			wrReg16(0xF0,page);
+			wrReg16(reg_addr, reg_val);
+		}
+	   	++next;
+	}
+}
 #endif
 #ifndef MT9D111
 void setColor(uint8_t color)
@@ -215,10 +238,16 @@ void initCam(void)
 {
 	#ifdef MT9D111
 		//_delay_ms(100);
+		wrSensorRegs8_16P(MT9D111_init);
 		wrSensorRegs8_16(MT9D111_QVGA);
-		wrReg16(0xF0,2);
-		wrReg16(0x0D,0);
-		wrReg16(0xF0,0);
+		wrSensorRegs8_16(MT9D111_RGB565);
+		wrReg16(0xF0,2);//page 2
+		wrReg16(0x0D,0);//spoof frame
+		wrReg16(0xF0,1);//page 1
+		wrReg16(0x97,1<<5);
+		wrReg16(0xC6, 0xA103); //SEQ_CMD
+		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
+		wrReg16(0xF0,0);//page 0
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider
