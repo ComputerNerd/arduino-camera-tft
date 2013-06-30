@@ -200,8 +200,15 @@ void editRegs(void)
 				#ifndef MT9D111
 					redrawT(address,val);
 				#endif
-			}
-			else if (x >= 126 && x <= 156){
+			#ifdef MT9D111
+			}else if (x >= 48 && x <= 80 && y > 64){
+				uint16_t off=(y-64)/32;
+				off=1<<off;
+				off<<=8;
+				val^=off;
+				val=updateReg(address,microedit,1,val,maddr,bitm8);
+			#endif
+			}else if (x >= 126 && x <= 156){
 				//change register value
 				if (y <= 256 && y >= 224){
 					++val;
