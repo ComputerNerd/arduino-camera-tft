@@ -58,9 +58,17 @@ const char menu1[] PROGMEM = "Pick a matrix";
 const char menu2[] PROGMEM = "Reset Reg";
 const char menu3[] PROGMEM = "Compare Matrix";
 const char menu4[] PROGMEM = "qqvga preview";
+#ifndef MT9D111
 const char menu5[] PROGMEM = "gamma edit";
+#else
+const char menu5[] PROGMEM = "Fixme";
+#endif
 const char menu6[] PROGMEM = "hq capture";
+#ifdef ov7670
 const char menu7[] PROGMEM = "White balance";
+#else
+const char menu7[] PROGMEM = "FIXME!";
+#endif
 const char menu8[] PROGMEM = "Image to PC";
 const char *const menu_table[] PROGMEM = {
 	menu0,menu1,menu2,menu3,
@@ -190,8 +198,8 @@ void menu(void)
 			case 4:
 				#ifdef ov7670
 					setColor(rgb565);
+					setRes(qqvga);
 				#endif
-				setRes(qqvga);
 				do{
 					getPoint(&x,&y,&z);
 					tft_setOrientation(1);
@@ -211,22 +219,27 @@ void menu(void)
 				setRes(vga);
 				#ifdef ov7670
 					wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+					_delay_ms(200);
+					wrReg(0x11,14);
 				#elif defined ov7740
-					wrReg(
+					//FIXME add support for ov7740 bayer
 				#endif
-				_delay_ms(200);
-				wrReg(0x11,14);
 				do{
 					getPoint(&x,&y,&z);
 					tft_setOrientation(1);
 					capImghq();
 					tft_setDisplayDirect(DOWN2UP);
 				}while(z<10);
-				initCam(0);
+				#ifdef ov7670
+					initCam(0);
+				#endif
 				setRes(qvga);
-				setColor(rgb565);
+				#ifndef MT9D111
+					setColor(rgb565);
+				#endif
 			break;
 			case 7:
+				#ifdef ov7670
 				{uint8_t pick=selection((const char**)wb_table,7);//registers from http://thinksmallthings.wordpress.com/2012/10/25/white-balance-control-with-ov7670/
 				if(pick==1||pick==2){
 					wrReg(0x13, 0xE7);
@@ -257,6 +270,7 @@ void menu(void)
 				setColor(rgb565);
 				capImg();
 				tft_setDisplayDirect(DOWN2UP);}
+				#endif
 			break;
 			case 8:
 				/*initCam(0);
@@ -266,17 +280,23 @@ void menu(void)
 				{uint8_t reso=selection((const char**)res_tab,2);
 				if(reso){
 					setRes(qvga);
-					setColor(yuv422);
+					#ifdef ov7670
+						setColor(yuv422);
+					#endif
 					
 				}else{
 					setRes(vga);
-					wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+					#ifdef ov7670
+						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+					#endif
 				}
-				_delay_ms(200);
-				if(reso)
-					wrReg(0x11,1);
-				else
-					wrReg(0x11,2);
+				#ifdef ov7670
+					_delay_ms(200);
+					if(reso)
+						wrReg(0x11,1);
+					else
+						wrReg(0x11,2);
+				#endif
 				tft_setOrientation(1);
 				do{
 					if(reso)

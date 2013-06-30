@@ -1,11 +1,12 @@
 #define F_CPU 16000000UL  // 16 MHz
-//#define MT9D111
-#define ov7670
+#define MT9D111
+//#define ov7670
 //#define ov7740
 #define vga 0
 #define qvga 1
+#ifndef MT9D111
 #define qqvga 2
-#ifdef MT9D111
+#else
 #define SVGA 3
 #define XGA 4
 #define WXGA 5

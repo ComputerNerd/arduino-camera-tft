@@ -40,17 +40,17 @@ void main(void)
 	TWSR&=~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
 	//initCam(0);
-	#ifdef ov7740
-		initCam();
-	#else
+	#ifdef ov7670
 		configSel();
+	#else
+		initCam();
 	#endif
 	//tft_drawStringP(PSTR("Starting"),120,300,4,WHITE);
 	menu();
 }
 
 #ifdef MT9D111
-void redrawT(uint8_t z,uint16_t regD,uint8_t micro,uint8_t id,uint8_t bit8)
+void redrawT(uint8_t z,uint16_t regD,uint8_t micro,uint8_t id,uint8_t bitm8)
 #else
 void redrawT(uint8_t z,uint8_t regD)
 #endif
@@ -79,6 +79,28 @@ void redrawT(uint8_t z,uint8_t regD)
 	#endif
 }
 #ifdef MT9D111
+uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8)
+{
+	if(microEdit){
+		wrReg16(0xC6,address|(1<<13)|(maddr<<8)|(bitm8<<15));
+		return rdReg16(0xC8);
+	}
+	else
+		return rdReg16(address);
+}
+uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16_t newVal,uint8_t maddr,uint8_t bitm8)
+{
+	if(write){
+		if(microEdit){
+			wrReg16(0xC6,address|(1<<13)|(maddr<<8)|(bitm8<<15));
+			wrReg16(0xC8,newVal);
+		}else
+			wrReg16(address,newVal);
+	}
+	newVal=rdRegE(address,microEdit,maddr,bitm8);
+	redrawT(address,newVal,microEdit,maddr,bitm8);
+	return newVal;
+}
 void editRegs(uint8_t microedit)
 #else
 void editRegs(void)
@@ -101,17 +123,11 @@ void editRegs(void)
 		redrawGUI();
 	#endif
 	#ifdef MT9D111
-		if(microedit){
-			wrReg16(0xC6,address|(1<<13)||(maddr<<8)|(bitm8<<15));
-			val=rdReg16(0xC8);
-		}else
-			val=rdReg16(address);
+		val=updateReg(address,microedit,0,0,maddr,bitm8);
 	#else
 		val=rdReg(address);
 	#endif
-	#ifdef MT9D111
-		redrawT(address,val,microedit,maddr,bitm8);
-	#else
+	#ifndef MT9D111
 		redrawT(address,val);
 	#endif
 	while (1){
@@ -130,8 +146,14 @@ void editRegs(void)
 				#else
 					redrawGUI();
 				#endif
-				val=rdReg(address);
-				redrawT(address,val);
+				#ifdef MT9D111
+					val=updateReg(address,microedit,0,0,maddr,bitm8);
+				#else
+					val=rdReg(address);
+				#endif
+				#ifndef MT9D111
+					redrawT(address,val);
+				#endif
 			}else if (x >= 188 && x <= 212 && y >= 224)
 				return;
 			else if (x >= 188 && x <= 212 && y <= 232 && y >= 136){
@@ -149,7 +171,7 @@ void editRegs(void)
 					tft_drawString((char *)buf,0,320,2,WHITE);
 					//p = ts.getPoint();//wait for screen to be pressed
 					getPoint(&x,&y,&z);
-					stp++;
+					++stp;
 				} while (z < 10);
 				tft_setDisplayDirect(DOWN2UP);
 				#ifdef MT9D111
@@ -157,58 +179,113 @@ void editRegs(void)
 				#else
 					redrawGUI();
 				#endif
-				val=rdReg(address);
-				redrawT(address,val);
+				#ifdef MT9D111
+					val=updateReg(address,microedit,0,0,maddr,bitm8);
+				#else
+					val=rdReg(address);
+				#endif
+				#ifndef MT9D111
+					redrawT(address,val);
+				#endif
 			}else if (x >= 80 && x <= 112 && y > 64){
 				uint8_t off=(y-64)/32;
 				off=1<<off;
 				val^=off;
-				wrReg(address,val);
-				val=rdReg(address);
-				redrawT(address,val);
+				#ifdef MT9D111
+					val=updateReg(address,microedit,1,val,maddr,bitm8);
+				#else
+					wrReg(address,val);
+					val=rdReg(address);
+				#endif
+				#ifndef MT9D111
+					redrawT(address,val);
+				#endif
 			}
 			else if (x >= 126 && x <= 156){
 				//change register value
 				if (y <= 256 && y >= 224){
-					val++;
-					wrReg(address,val);
-					val=rdReg(address);
-					redrawT(address,val);
+					++val;
+					#ifdef MT9D111
+						val=updateReg(address,microedit,1,val,maddr,bitm8);
+					#else
+						wrReg(address,val);
+						val=rdReg(address);
+					#endif
+					#ifndef MT9D111
+						redrawT(address,val);
+					#endif
 				}else if (y <= 224 && y >= 192){
-					val--;
-					wrReg(address,val);
-					val=rdReg(address);
-					redrawT(address,val);
+					--val;
+					#ifdef MT9D111
+						val=updateReg(address,microedit,1,val,maddr,bitm8);
+					#else
+						wrReg(address,val);
+						val=rdReg(address);
+					#endif
+					#ifndef MT9D111
+						redrawT(address,val);
+					#endif
 				}else if (y <= 160 && y >= 136){
 					val+=16;
-					wrReg(address,val);
-					val=rdReg(address);
-					redrawT(address,val);
+					#ifdef MT9D111
+						val=updateReg(address,microedit,1,val,maddr,bitm8);
+					#else
+						wrReg(address,val);
+						val=rdReg(address);
+					#endif
+					#ifndef MT9D111
+						redrawT(address,val);
+					#endif
 				}else if (y <= 112 && y >= 88){
 					val-=16;
-					wrReg(address,val);
-					val=rdReg(address);
-					redrawT(address,val);
+					#ifdef MT9D111
+						val=updateReg(address,microedit,1,val,maddr,bitm8);
+					#else
+						wrReg(address,val);
+						val=rdReg(address);
+					#endif
+					#ifndef MT9D111
+						redrawT(address,val);
+					#endif
 				}
 			}else if (x >= 156 && x <= 188){
 				if (y <= 256 && y >= 224){
 					++address;
-					val=rdReg(address);
-					redrawT(address,val);
+					#ifdef MT9D111
+						val=updateReg(address,microedit,0,0,maddr,bitm8);
+					#else
+						val=rdReg(address);
+					#endif
+					#ifndef MT9D111
+						redrawT(address,val);
+					#endif
 				}else if (y <= 224 && y >= 192){
 					--address;
-					val=rdReg(address);
-					redrawT(address,val);
+					#ifdef MT9D111
+						val=updateReg(address,microedit,0,0,maddr,bitm8);
+					#else
+						val=rdReg(address);
+					#endif
+					#ifndef MT9D111
+						redrawT(address,val);
+					#endif
 				}
 			}
 		}
-		uint8_t val2=rdReg(address);
-		if (val2 != val){
+		#ifdef MT9D111
+			uint16_t val2=rdRegE(address,microedit,maddr,bitm8);
+		#else
+			uint8_t val2=rdReg(address);
+		#endif
+		if (val2!=val){
 			val=val2;
-			redrawT(address,val);
+			#ifdef MT9D111
+				redrawT(address,val,microedit,maddr,bitm8);
+			#else
+				redrawT(address,val);
+			#endif
 		}
 	}//end of loop
-	//tft_paintScreenBlack();
 }
 uint16_t leadingZeros(uint8_t x)
 {
@@ -220,11 +297,4 @@ uint16_t leadingZeros(uint8_t x)
 		len2-=32;
 	}
 	return len2;
-}
-static uint16_t editer;//current value
-static uint16_t minE;
-static uint16_t maxE;
-void update_edit(const char * text)
-{
-	
 }

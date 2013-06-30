@@ -25,8 +25,13 @@ void capImgqqvga(uint8_t offsetx)
 	h=120;
     DDRA=0xFF;
     DDRC=0;
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
+	#ifdef MT9D111
+		while (PINE&32){}//wait for low
+		while (!(PINE&32)){}//wait for high
+	#else
+		while (!(PINE&32)){}//wait for high
+		while (PINE&32){}//wait for low
+	#endif
 	while (h--){
 		tft_setXY(y,offsetx);
 		++y;
@@ -64,9 +69,13 @@ void capImghq(void)
     DDRA=0xFF;
     DDRC=0;
    	uint8_t *line,*line2;
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
-	//while (!(PINE&16)){}//wait for high
+	#ifdef MT9D111
+		while (PINE&32){}//wait for low
+		while (!(PINE&32)){}//wait for high
+	#else
+		while (!(PINE&32)){}//wait for high
+		while (PINE&32){}//wait for low
+	#endif
 	while (h--){
 		ww=w;
 		line=buf;
@@ -127,8 +136,13 @@ void capImgOff(uint8_t off)
 	uint8_t h;
 	w=640;
 	h=240;
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
+	#ifdef MT9D111
+		while (PINE&32){}//wait for low
+		while (!(PINE&32)){}//wait for high
+	#else
+		while (!(PINE&32)){}//wait for high
+		while (PINE&32){}//wait for low
+	#endif
 	if(off!=0){
 			while (off--){
 			ww=w;
@@ -178,8 +192,13 @@ void capImgPCqvga(void)
 	RD_HIGH;
 	DDRA=0xFF;
 	DDRC=0;
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
+	#ifdef MT9D111
+		while (PINE&32){}//wait for low
+		while (!(PINE&32)){}//wait for high
+	#else
+		while (!(PINE&32)){}//wait for high
+		while (PINE&32){}//wait for low
+	#endif
 	while (h--){
 		ww=w;
 		while (ww--){
@@ -219,8 +238,13 @@ void capImg(void)
 	RD_HIGH;
 	DDRA=0xFF;
 	DDRC=0;
-	while (!(PINE&32)){}//wait for high
-	while (PINE&32){}//wait for low
+	#ifdef MT9D111
+		while (PINE&32){}//wait for low
+		while (!(PINE&32)){}//wait for high
+	#else
+		while (!(PINE&32)){}//wait for high
+		while (PINE&32){}//wait for low
+	#endif
 	while (h--){
 		ww=w;
 		while (ww--){
