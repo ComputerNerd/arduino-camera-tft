@@ -25,7 +25,7 @@ void main(void)
 	//generate 8mhz clock
 	TCCR5A =67;
 	TCCR5B=17;
-	OCR5A = 1;// F_CPU/(2*(x+1))
+	OCR5A = 3;// F_CPU/(2*(x+1))
 	DDRC=0;
 	DDRG|=1<<5;
 	UBRR0H=0;
