@@ -93,7 +93,11 @@ const char wb4[] PROGMEM="Cloudy";
 const char wb5[] PROGMEM="Office";
 const char wb6[] PROGMEM="Home";
 const char *const wb_table[] PROGMEM={wb0,wb1,wb2,wb3,wb4,wb5,wb6};
+#ifdef MT9D111
+const char res0[] PROGMEM="SVGA";
+#else
 const char res0[] PROGMEM="VGA";
+#endif
 const char res1[] PROGMEM="QVGA";
 const char *const res_tab[] PROGMEM={res0,res1};
 uint8_t selection(const char ** table,uint8_t maxitems)
@@ -174,7 +178,11 @@ void menu(void)
 			#endif
 		break;
 		case 2:
-			initCam(0);
+			#ifdef ov7670
+				initCam(0);
+			#else
+				initCam();
+			#endif
 		break;
 		#ifndef MT9D111
 		case 3:
@@ -276,7 +284,9 @@ void menu(void)
 				/*initCam(0);
 				_delay_ms(200);
 				wrReg(0x11,2);*/
+				#ifdef ov7670
 				wrReg(0x1e,rdReg(0x1e)&(~(1<<5))&(~(1<<4)));
+				#endif
 				{uint8_t reso=selection((const char**)res_tab,2);
 				if(reso){
 					setRes(qvga);
@@ -285,7 +295,10 @@ void menu(void)
 					#endif
 					
 				}else{
-					setRes(vga);
+					//setRes(vga);
+					#ifdef MT9D111
+						setRes(qvga);
+					#endif
 					#ifdef ov7670
 						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
 					#endif

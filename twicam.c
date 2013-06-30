@@ -238,21 +238,22 @@ void initCam(void)
 {
 	#ifdef MT9D111
 		//_delay_ms(100);
-		wrSensorRegs8_16P(MT9D111_init);
+		//wrSensorRegs8_16P(MT9D111_init);
 		wrSensorRegs8_16(MT9D111_QVGA);
 		wrSensorRegs8_16(MT9D111_RGB565);
-		wrReg16(0xF0,2);//page 2
-		wrReg16(0x0D,0);
 		wrReg16(0xF0,1);//page 1
 		wrReg16(0xC6, 0xA103); //SEQ_CMD
 		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
+		wrReg16(0xA4,(1<<5));
+		wrReg16(0xF0,2);//page 2
+		wrReg16(0x0D,0);
 		//wrReg16(0xF0,0);//page 0
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider
 		wrReg(0x55,0);//disable double
 		wrReg(0x83,rdReg(0x83)|(1<<2));//RAW 8
-	#else
+	#elif defined ov7670
 		wrReg(0x12, 0x80);
 		_delay_ms(100);
 		if(bayerUse==2){
@@ -269,5 +270,7 @@ void initCam(void)
 			wrReg(0x1e,rdReg(0x1e)|(1<<5));//hflip
 		wrReg(REG_COM10,32);//pclk does not toggle on HBLANK
 		wrReg(REG_COM11,226);//enable night mode 1/8 frame rate COM11
+	#else
+		#error "No sensor selected"
 	#endif
 }

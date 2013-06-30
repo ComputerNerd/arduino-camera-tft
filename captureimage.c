@@ -124,7 +124,7 @@ inline void serialWrB(uint8_t dat)
 	UDR0=dat;
 	while ( !( UCSR0A & (1<<UDRE0)) ) {} //wait for byte to transmit
 }
-void capImgOff(uint8_t off)
+void capImgOff(uint16_t off)
 {
 	tft_setXY(0,0);
 	CS_LOW;
@@ -134,12 +134,14 @@ void capImgOff(uint8_t off)
 	DDRC=0;
 	uint16_t w,ww;
 	uint8_t h;
-	w=640;
-	h=240;
 	#ifdef MT9D111
+		w=1600;
+		h=96;
 		while (PINE&32){}//wait for low
 		while (!(PINE&32)){}//wait for high
 	#else
+		w=640;
+		h=240;
 		while (!(PINE&32)){}//wait for high
 		while (PINE&32){}//wait for low
 	#endif
@@ -219,10 +221,18 @@ void capImgPC(void)
 	serialWrB('R');
 	serialWrB('D');
 	serialWrB('Y');
-	capImgOff(0);
-	transBuffer();
-	capImgOff(240);
-	transBuffer();
+	#ifdef MT9D111
+		uint16_t o;
+		for(o=0;o<576;o+=96){
+			capImgOff(o);
+			transBuffer();
+		}
+	#else
+		capImgOff(0);
+		transBuffer();
+		capImgOff(240);
+		transBuffer();
+	#endif
 	sei();
 }
 void capImg(void)
@@ -260,9 +270,9 @@ void capImg(void)
 	sei();
 	//convert yuv422 to rgb565 this may take awhile
 	uint16_t x,y;
-	for (y=0;y<240;y++){
+	for (y=0;y<240;++y){
 	uint16_t * bufPtr=(uint16_t *)buf;
-	for (x=0;x<320;x++){
+	for (x=0;x<320;++x){
 		tft_setXY(y,x);
 		*bufPtr++=tft_readRegister(0x22);
 	}

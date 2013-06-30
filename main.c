@@ -63,14 +63,21 @@ void redrawT(uint8_t z,uint8_t regD)
 	#endif
 	tft_drawStringP(PSTR("Register:"),0,320,2,WHITE);
 	utoa(z,(char *)buf,16);
+	#ifdef MT9D111
+		if(micro)
+			tft_drawString((char *)buf,0,208,2,WHITE);
+		else
+	#endif
 	tft_drawString((char *)buf,0,176,2,WHITE);
 	utoa(regD,(char *)buf,16);
 	tft_drawString((char *)buf,16,320,2,WHITE);
 	utoa(regD,(char *)buf,10);
 	tft_drawString((char *)buf,32,320,2,WHITE);
 	#ifdef MT9D111
-		if(micro)
-			
+		if(micro){
+			utoa(id,(char*)buf,16);
+			tft_drawChar(',',0,176,2,WHITE);
+		}
 		utoa(regD>>8,(char *)buf,2);
 		tft_drawString((char *)buf,48,leadingZeros(48),4,WHITE);
 		utoa(regD&255,(char *)buf,2);
@@ -111,6 +118,13 @@ void editRegs(void)
 	uint16_t x,y,z;
 	#ifdef MT9D111
 		uint16_t val;
+		wrReg16(0xF0,2);
+		if(rdReg16(0xD)!=0){
+			tft_fillRectangle(0,320,112,320,BLACK);
+			tft_drawStringP(PSTR("Warning 0x0D"),0,320,1,WHITE);
+			_delay_ms(1000);
+			wrReg16(0x0D,0);
+		}
 	#else
 		uint8_t val;
 	#endif
@@ -283,7 +297,7 @@ void editRegs(void)
 				}
 			}
 		}
-		#ifdef MT9D111
+		/*#ifdef MT9D111
 			uint16_t val2=rdRegE(address,microedit,maddr,bitm8);
 		#else
 			uint8_t val2=rdReg(address);
@@ -295,7 +309,7 @@ void editRegs(void)
 			#else
 				redrawT(address,val);
 			#endif
-		}
+		}*/
 	}//end of loop
 }
 uint16_t leadingZeros(uint8_t x)
