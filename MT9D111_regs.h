@@ -1104,7 +1104,7 @@ const struct regval_list MT9D111_RGB565[] PROGMEM =
 	{0xC6, 0xA77E	}, //MODE_OUTPUT_FORMAT_B
 	{0xC8, 0x0020	}, //MODE_OUTPUT_FORMAT_B; RGB565
 	{0xC6, 0xA103	}, //SEQ_CMD
-	{10xC8, 0x0005	}, //SEQ_CMD, refresh
+	{0xC8, 0x0005	}, //SEQ_CMD, refresh
 	{0xff, 0xffff }
 };
 // For VGA ( 640 x 480) on 3BA module

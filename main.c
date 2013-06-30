@@ -165,7 +165,7 @@ void editRegs(void)
 				#endif
 				do {
 					wrReg(address,stp);
-					_delay_ms(1000);//give register time to settle
+					_delay_ms(100);//give register time to settle
 					tft_setOrientation(1);
 					capImg();
 					utoa(stp,(char *)buf,10);
@@ -259,6 +259,8 @@ void editRegs(void)
 				if (y <= 256 && y >= 224){
 					++address;
 					#ifdef MT9D111
+						if(address==0xF1)
+							++address;
 						val=updateReg(address,microedit,0,0,maddr,bitm8);
 					#else
 						val=rdReg(address);
@@ -269,6 +271,8 @@ void editRegs(void)
 				}else if (y <= 224 && y >= 192){
 					--address;
 					#ifdef MT9D111
+						if(address==0xF1)
+							--address;
 						val=updateReg(address,microedit,0,0,maddr,bitm8);
 					#else
 						val=rdReg(address);

@@ -242,12 +242,11 @@ void initCam(void)
 		wrSensorRegs8_16(MT9D111_QVGA);
 		wrSensorRegs8_16(MT9D111_RGB565);
 		wrReg16(0xF0,2);//page 2
-		wrReg16(0x0D,0);//spoof frame
+		wrReg16(0x0D,0);
 		wrReg16(0xF0,1);//page 1
-		wrReg16(0x97,1<<5);
 		wrReg16(0xC6, 0xA103); //SEQ_CMD
 		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
-		wrReg16(0xF0,0);//page 0
+		//wrReg16(0xF0,0);//page 0
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider
