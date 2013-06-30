@@ -15,4 +15,8 @@ void setRes(uint8_t res);
 void wrSensorRegs8_8(const struct regval_list reglist[]);
 extern const struct regval_list ov7670_default_regs[];
 #endif
+#ifdef ov7740
+void initCam(void);
+#else
 void initCam(uint8_t bayerUse);
+#endif

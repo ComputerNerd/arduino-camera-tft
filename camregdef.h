@@ -1,6 +1,13 @@
 #pragma once
 #include "config.h"
-#ifndef MT9D111
+#ifdef ov7740
+#define ISP_CTRL00 0x80
+#define ISP_CTRL00_gamma (1<<3)
+#define ISP_CTRL01 0x80
+#define ISP_CTRL01_CMX_enable 2
+#define ISP_CTRL02 0x82
+#endif
+#ifdef ov7670
 /* Control 1 */
 #define REG_COM7	0x12	/* Control 7 */
 #define   COM7_RESET	  0x80	  /* Register reset */

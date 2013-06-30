@@ -10,23 +10,32 @@ void setmatrix(uint8_t id)
 {
 	switch (id) {
 		case 0:
-			wrReg(MTX1,0x80);        
-			wrReg(MTX2,0x80);      
-			wrReg(MTX3,0x00);        
-			wrReg(MTX4,0x22);        
-			wrReg(MTX5,0x5e);        
-			wrReg(MTX6,0x80);        
-			wrReg(MTXS,0x9e); 
+			#ifdef ov7670
+				wrReg(MTX1,0x80);        
+				wrReg(MTX2,0x80);      
+				wrReg(MTX3,0x00);        
+				wrReg(MTX4,0x22);        
+				wrReg(MTX5,0x5e);        
+				wrReg(MTX6,0x80);        
+				wrReg(MTXS,0x9e); 
+			#elif defined ov7740
+				wrReg(ISP_CTRL01,rdReg(ISP_CTRL01)&(~ISP_CTRL01_CMX_enable));
+			#endif
 		break;
 		case 1:
-			wrReg(MTX1,0x40);        
-			wrReg(MTX2,0x34);      
-			wrReg(MTX3,0x0c);        
-			wrReg(MTX4,0x17);
-			wrReg(MTX5,0x29);        
-			wrReg(MTX6,0x40);
-			wrReg(MTXS,0x1A);
+			#ifdef ov7670
+				wrReg(MTX1,0x40);        
+				wrReg(MTX2,0x34);      
+				wrReg(MTX3,0x0c);        
+				wrReg(MTX4,0x17);
+				wrReg(MTX5,0x29);        
+				wrReg(MTX6,0x40);
+				wrReg(MTXS,0x1A);
+			#elif defined ov7740
+				wrReg(ISP_CTRL01,rdReg(ISP_CTRL01)|ISP_CTRL01_CMX_enable);
+			#endif
 		break;
+		#ifdef ov7670
 		case 2:
 			wrReg(MTX1,0xB3);        
 			wrReg(MTX2,0xB3);      
@@ -36,6 +45,7 @@ void setmatrix(uint8_t id)
 			wrReg(MTX6,0xE4);
 			wrReg(MTXS,0x9E);
 		break;
+		#endif
 	}
 }
 #endif
@@ -57,10 +67,16 @@ const char *const menu_table[] PROGMEM = {
 	menu4,menu5,menu6,menu7,
 	menu8
 };
+#ifdef ov7670
 const char maxtrix0[] PROGMEM = "Maxtrix yuv422";
 const char maxtrix1[] PROGMEM = "Maxtrix 2";
 const char maxtrix2[] PROGMEM = "Maxtrix rgb565";
 const char *const maxtrix_table[] PROGMEM = {maxtrix0,maxtrix1,maxtrix2};
+#elif defined ov7740
+const char maxtrix0[] PROGMEM = "Maxtrix off";
+const char maxtrix1[] PROGMEM = "OVT Maxtrix";
+const char *const maxtrix_table[] PROGMEM = {maxtrix0,maxtrix1};
+#endif
 const char wb0[] PROGMEM="No AWB";
 const char wb1[] PROGMEM="Advanced AWB";
 const char wb2[] PROGMEM="Simple AWB";
@@ -111,6 +127,7 @@ uint8_t selection(const char ** table,uint8_t maxitems)
 	tft_paintScreenBlack();
 	return item;
 }
+#ifdef ov7670
 const char config0[] PROGMEM = "Linux driver";
 const char config1[] PROGMEM = "suwa-koubou";
 const char config2[] PROGMEM = "Arducam";
@@ -119,6 +136,7 @@ void configSel(void)
 {
 	initCam(selection((const char**)config_tab,3));
 }
+#endif
 void menu(void)
 {
 	uint16_t x,y,z;
@@ -137,7 +155,11 @@ void menu(void)
 			#ifdef MT9D111
 				editRegs(1);
 			#else
-				setmatrix(selection((const char**)maxtrix_table,3));
+				#ifdef ov7740
+					setmatrix(selection((const char**)maxtrix_table,2));
+				#else
+					setmatrix(selection((const char**)maxtrix_table,3));
+				#endif
 				tft_setOrientation(1);
 				capImg();
 				tft_setDisplayDirect(DOWN2UP);
@@ -150,10 +172,14 @@ void menu(void)
 		case 3:
 			//compare matrixes
 			tft_setOrientation(1);
-			do {
+			do{
 				getPoint(&x,&y,&z);
 				uint8_t a;
-				for (a=0;a<3;a++){
+				#ifdef ov7670
+					for (a=0;a<3;a++){
+				#elif defined ov7740
+					for (a=0;a<2;a++){
+				#endif
 					setmatrix(a);
 					capImg();
 				}
@@ -162,7 +188,9 @@ void menu(void)
 		break;
 		#endif
 			case 4:
-				setColor(rgb565);
+				#ifdef ov7670
+					setColor(rgb565);
+				#endif
 				setRes(qqvga);
 				do{
 					getPoint(&x,&y,&z);
@@ -173,13 +201,19 @@ void menu(void)
 				setRes(qvga);
 			break;
 			case 5:
-				setColor(rgb565);
+				#ifdef ov7670
+					setColor(rgb565);
+				#endif
 				gammaEdit();
 			break;
 			case 6:
 				//initCam(1);
 				setRes(vga);
-				wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+				#ifdef ov7670
+					wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+				#elif defined ov7740
+					wrReg(
+				#endif
 				_delay_ms(200);
 				wrReg(0x11,14);
 				do{

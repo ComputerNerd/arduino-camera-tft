@@ -40,7 +40,11 @@ void main(void)
 	TWSR&=~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
 	//initCam(0);
-	configSel();
+	#ifdef ov7740
+		initCam();
+	#else
+		configSel();
+	#endif
 	//tft_drawStringP(PSTR("Starting"),120,300,4,WHITE);
 	menu();
 }
