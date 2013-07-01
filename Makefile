@@ -85,7 +85,7 @@ PROJECTNAME=cameratft
 # (list all files to compile, e.g. 'a.c b.cpp as.S'):
 # Use .cc, .cpp or .C suffix for C++ files, use .S 
 # (NOT .s !!!) for assembly source code files.
-PRJSRC=main.c font.c twicam.c drawgui.c TFT.c TouchScreen.c captureimage.c gammaedit.c selections.c
+PRJSRC=main.c font.c twicam.c drawgui.c TFT.c TouchScreen.c captureimage.c gammaedit.c selections.c MT9D111_regs.c
 
 # additional includes (e.g. -I/path/to/mydir)
 INC=

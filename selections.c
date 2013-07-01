@@ -3,6 +3,7 @@
 #include "twicam.h"
 #include "camregdef.h"
 #include "config.h"
+#include "MT9D111_regs.h"
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 #ifndef MT9D11
@@ -94,11 +95,12 @@ const char wb5[] PROGMEM="Office";
 const char wb6[] PROGMEM="Home";
 const char *const wb_table[] PROGMEM={wb0,wb1,wb2,wb3,wb4,wb5,wb6};
 #ifdef MT9D111
-const char res0[] PROGMEM="SVGA";
+const char res0[] PROGMEM="UXVGA";
+const char res1[] PROGMEM="SVGA";
 #else
 const char res0[] PROGMEM="VGA";
-#endif
 const char res1[] PROGMEM="QVGA";
+#endif
 const char *const res_tab[] PROGMEM={res0,res1};
 uint8_t selection(const char ** table,uint8_t maxitems)
 {
@@ -136,6 +138,8 @@ uint8_t selection(const char ** table,uint8_t maxitems)
 		if(item<maxitems)
 			break;
 	}
+	tft_drawStringP((PGM_P)pgm_read_word(&(table[item])),item*24,320,3,RED);
+	_delay_ms(100);
 	tft_paintScreenBlack();
 	return item;
 }
@@ -281,23 +285,24 @@ void menu(void)
 				#endif
 			break;
 			case 8:
-				/*initCam(0);
-				_delay_ms(200);
-				wrReg(0x11,2);*/
 				#ifdef ov7670
 				wrReg(0x1e,rdReg(0x1e)&(~(1<<5))&(~(1<<4)));
 				#endif
 				{uint8_t reso=selection((const char**)res_tab,2);
 				if(reso){
+					#ifdef MT9D111
+						wrSensorRegs8_16(default_size_b_list);
+					#else
 					setRes(qvga);
-					#ifdef ov7670
+					#endif
+					#ifndef MT9D111
 						setColor(yuv422);
 					#endif
 					
 				}else{
 					//setRes(vga);
 					#ifdef MT9D111
-						setRes(qvga);
+						wrSensorRegs8_16(default_size_a_list);
 					#endif
 					#ifdef ov7670
 						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...

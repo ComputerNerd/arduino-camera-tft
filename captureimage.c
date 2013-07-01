@@ -184,6 +184,13 @@ void capImgPCqvga(void)
 	serialWrB('R');
 	serialWrB('D');
 	serialWrB('Y');
+	#ifdef MT9D111
+		uint16_t o;
+		for(o=0;o<576;o+=96){
+			capImgOff(o);
+			transBuffer();
+		}
+	#else
 	uint16_t w,ww;
 	uint8_t h;
 	w=640;
@@ -213,6 +220,7 @@ void capImgPCqvga(void)
 
 	}
 	transBuffer();
+	#endif
 }
 void capImgPC(void)
 {//sends raw bayer data to serial
@@ -223,7 +231,7 @@ void capImgPC(void)
 	serialWrB('Y');
 	#ifdef MT9D111
 		uint16_t o;
-		for(o=0;o<576;o+=96){
+		for(o=0;o<1152;o+=96){
 			capImgOff(o);
 			transBuffer();
 		}
