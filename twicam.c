@@ -240,11 +240,11 @@ void initCam(void)
 		//_delay_ms(100);
 		//wrSensorRegs8_16P(MT9D111_init);
 		wrSensorRegs8_16(MT9D111_QVGA);
-		wrSensorRegs8_16(MT9D111_RGB565);
+		//wrSensorRegs8_16(MT9D111_RGB565);
 		wrReg16(0xF0,1);//page 1
 		wrReg16(0xC6, 0xA103); //SEQ_CMD
 		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
-		wrReg16(0xA4,(1<<5));
+		//wrReg16(0xA4,(1<<5));
 		wrReg16(0xF0,2);//page 2
 		wrReg16(0x0D,0);
 		//wrReg16(0xF0,0);//page 0
