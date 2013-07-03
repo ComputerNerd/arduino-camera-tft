@@ -124,7 +124,11 @@ inline void serialWrB(uint8_t dat)
 	UDR0=dat;
 	while ( !( UCSR0A & (1<<UDRE0)) ) {} //wait for byte to transmit
 }
+#ifdef MT9D111
 void capImgOff(uint16_t off)
+#else
+void capImgOff(uint8_t off)
+#endif
 {
 	tft_setXY(0,0);
 	CS_LOW;
@@ -149,8 +153,14 @@ void capImgOff(uint16_t off)
 			while (off--){
 			ww=w;
 			while(ww--){
+				#ifdef MT9D111
+				while (!(PINE&16)){}//wait for high
+				while (PINE&16){}//wait for low
+				#else
 				while (PINE&16){}//wait for low
 				while (!(PINE&16)){}//wait for high
+				#endif
+				
 			}
 		}
 	}
@@ -243,6 +253,27 @@ void capImgPC(void)
 	#endif
 	sei();
 }
+#ifdef MT9D111
+uint32_t capJpeg(void){
+	cli();
+	tft_setXY(0,0);
+	CS_LOW;
+	RS_HIGH;
+	RD_HIGH;
+	DDRA=0xFF;
+	DDRC=0;
+	while (PINE&32){}//wait for low
+	while (!(PINE&32)){}//wait for high
+	while (PINE&32){//keep reading until no vaild jpeg data is output
+		WR_LOW;
+		while (PINE&16){}//wait for low
+		PORTA=PINC;
+		WR_HIGH;
+		while (!(PINE&16)){}//wait for high
+	}
+	sei();
+}
+#endif
 void capImg(void)
 {
 	cli();
@@ -279,51 +310,50 @@ void capImg(void)
 	//convert yuv422 to rgb565 this may take awhile
 	uint16_t x,y;
 	for (y=0;y<240;++y){
-	uint16_t * bufPtr=(uint16_t *)buf;
-	for (x=0;x<320;++x){
-		tft_setXY(y,x);
-		*bufPtr++=tft_readRegister(0x22);
+		uint16_t * bufPtr=(uint16_t *)buf;
+		for (x=0;x<320;++x){
+			tft_setXY(y,x);
+			*bufPtr++=tft_readRegister(0x22);
+		}
+		DDRA=0xFF;
+		tft_setXY(y,0);
+		CS_LOW;
+		RS_HIGH;
+		RD_HIGH;
+		for (x=0;x<640;x+=4){
+			uint16_t h1,h2;
+			uint8_t rgb[6];
+			rgb[0]=YUV2R((int32_t)buf[x],(int32_t)buf[x+1],(int32_t)buf[x+3]);
+			rgb[1]=YUV2G((int32_t)buf[x],(int32_t)buf[x+1],(int32_t)buf[x+3]);
+			rgb[2]=YUV2B((int32_t)buf[x],(int32_t)buf[x+1],(int32_t)buf[x+3]);
+			rgb[3]=YUV2R((int32_t)buf[x+2],(int32_t)buf[x+1],(int32_t)buf[x+3]);
+			rgb[4]=YUV2G((int32_t)buf[x+2],(int32_t)buf[x+1],(int32_t)buf[x+3]);
+			rgb[5]=YUV2B((int32_t)buf[x+2],(int32_t)buf[x+1],(int32_t)buf[x+3]);
+			rgb[0]>>=3;
+			rgb[1]>>=2;
+			rgb[2]>>=3;
+			rgb[3]>>=3;
+			rgb[4]>>=2;
+			rgb[5]>>=3;
+			h1= ((uint16_t)rgb[0] << 11) | ((uint16_t)rgb[1] << 5) | (uint16_t)rgb[2];
+			h2=((uint16_t)rgb[3] << 11) | ((uint16_t)rgb[4] << 5) | (uint16_t)rgb[5];
+			//tft_setPixel(y,x/2,h1);
+			//tft_setPixel(y,x/2+1,h2);
+			WR_LOW;
+			PORTA=h1>>8;
+			WR_HIGH;
+			WR_LOW;
+			PORTA=h1&255;
+			WR_HIGH;
+			WR_LOW;
+			PORTA=h2>>8;
+			WR_HIGH;
+			WR_LOW;
+			PORTA=h2&255;
+			WR_HIGH;
+		}
 	}
-	DDRA=0xFF;
-	tft_setXY(y,0);
-	CS_LOW;
-	RS_HIGH;
-	RD_HIGH;
-   for (x=0;x<640;x+=4)
-   {
-   uint16_t h1,h2;
-   uint8_t rgb[6];
-  rgb[0]=YUV2R((int32_t)buf[x],(int32_t)buf[x+1],(int32_t)buf[x+3]);
-  rgb[1]=YUV2G((int32_t)buf[x],(int32_t)buf[x+1],(int32_t)buf[x+3]);
-  rgb[2]=YUV2B((int32_t)buf[x],(int32_t)buf[x+1],(int32_t)buf[x+3]);
-  rgb[3]=YUV2R((int32_t)buf[x+2],(int32_t)buf[x+1],(int32_t)buf[x+3]);
-  rgb[4]=YUV2G((int32_t)buf[x+2],(int32_t)buf[x+1],(int32_t)buf[x+3]);
-  rgb[5]=YUV2B((int32_t)buf[x+2],(int32_t)buf[x+1],(int32_t)buf[x+3]);
-  rgb[0]>>=3;
-  rgb[1]>>=2;
-  rgb[2]>>=3;
-  rgb[3]>>=3;
-  rgb[4]>>=2;
-  rgb[5]>>=3;
-  h1= ((uint16_t)rgb[0] << 11) | ((uint16_t)rgb[1] << 5) | (uint16_t)rgb[2];
-  h2=((uint16_t)rgb[3] << 11) | ((uint16_t)rgb[4] << 5) | (uint16_t)rgb[5];
-      // tft_setPixel(y,x/2,h1);
-     //    tft_setPixel(y,x/2+1,h2);
-      WR_LOW;
-      PORTA=h1>>8;
-      WR_HIGH;
-      WR_LOW;
-      PORTA=h1&255;
-      WR_HIGH;
-      WR_LOW;
-      PORTA=h2>>8;
-      WR_HIGH;
-      WR_LOW;
-      PORTA=h2&255;
-      WR_HIGH;
-   }
-  }
- #endif
- CS_HIGH;
- sei();
+	#endif
+	CS_HIGH;
+	sei();
 }

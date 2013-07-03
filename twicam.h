@@ -10,7 +10,7 @@ struct regval_list {
 	uint8_t reg_num;
 	uint16_t value;
 };
-#define EX3691_TOK_DELAY 3
+#define MT9D111_DELAY 3
 #define EndRegs_MT9D111 4
 struct regval_listP {
 	uint8_t page;

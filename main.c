@@ -23,9 +23,9 @@ void main(void)
 	DDRL|=8;
 	ASSR &= ~(_BV(EXCLK) | _BV(AS2));
 	//generate 8mhz clock
-	TCCR5A =67;
+	TCCR5A=67;
 	TCCR5B=17;
-	OCR5A = 3;// F_CPU/(2*(x+1))
+	OCR5A=0;// F_CPU/(2*(x+1))
 	DDRC=0;
 	DDRG|=1<<5;
 	UBRR0H=0;
@@ -34,21 +34,18 @@ void main(void)
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0);//Enable receiver and transmitter
 	UCSR0C=6;//async 1 stop bit 8bit char no parity bits
 	uint8_t error;
-	tft_init();  //init TFT library
+	tft_init();//init TFT library
 	tft_setDisplayDirect(DOWN2UP);
 	cli();
 	TWSR&=~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
-	//initCam(0);
 	#ifdef ov7670
 		configSel();
 	#else
 		initCam();
 	#endif
-	//tft_drawStringP(PSTR("Starting"),120,300,4,WHITE);
 	menu();
 }
-
 #ifdef MT9D111
 void redrawT(uint8_t z,uint16_t regD,uint8_t micro,uint8_t id,uint8_t bitm8)
 #else

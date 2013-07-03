@@ -139,7 +139,7 @@ void wrSensorRegs8_16P(const struct regval_listP reglist[])
 		page=pgm_read_byte(&next->page);
 		reg_addr = pgm_read_byte(&next->reg_num);
 		reg_val = pgm_read_word(&next->value);
-		if(page==EX3691_TOK_DELAY){
+		if(page==MT9D111_DELAY){
 			uint8_t l;
 			for(l=0;l<reg_val;++l)
 				_delay_ms(100);
@@ -245,10 +245,11 @@ void initCam(void)
 		wrReg16(0xF0,1);//page 1
 		wrReg16(0xC6, 0xA103); //SEQ_CMD
 		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
-		//wrReg16(0xA4,(1<<5));
+		//wrReg16(0xA4,(1<<5));//dithering
 		wrReg16(0xF0,2);//page 2
 		wrReg16(0x0D,0);
-		//wrReg16(0xF0,0);//page 0
+		wrReg16(0xF0,0);//page 0
+		wrReg16(0x0A,4);
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider

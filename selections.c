@@ -289,6 +289,10 @@ void menu(void)
 				wrReg(0x1e,rdReg(0x1e)&(~(1<<5))&(~(1<<4)));
 				#endif
 				{uint8_t reso=selection((const char**)res_tab,2);
+				#ifdef MT9D111
+					wrReg16(0xF0,2);//page 2
+					wrReg16(0x0D,0);
+				#endif
 				if(reso){
 					#ifdef MT9D111
 						wrSensorRegs8_16(default_size_b_list);
