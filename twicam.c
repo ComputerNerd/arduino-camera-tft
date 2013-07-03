@@ -114,6 +114,7 @@ uint16_t rdReg16(uint8_t reg)
 	dat=twiRd(0)<<8;
 	dat|=twiRd(1);
 	TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWSTO);//send stop
+	_delay_ms(1);
 	PORTG&=~(1<<5);
 	return dat;
 }
@@ -140,9 +141,9 @@ void wrSensorRegs8_16P(const struct regval_listP reglist[])
 		reg_addr = pgm_read_byte(&next->reg_num);
 		reg_val = pgm_read_word(&next->value);
 		if(page==MT9D111_DELAY){
-			uint8_t l;
+			uint16_t l;
 			for(l=0;l<reg_val;++l)
-				_delay_ms(100);
+				_delay_ms(1);
 		}else if(page==EndRegs_MT9D111)
 			break;
 		else{
@@ -237,8 +238,9 @@ void initCam(void)
 #endif
 {
 	#ifdef MT9D111
-		//_delay_ms(100);
-		//wrSensorRegs8_16P(MT9D111_init);
+		_delay_ms(1000);
+		wrSensorRegs8_16P(MT9D111_init);
+		//_delay_ms(1000);
 		//wrSensorRegs8_16(MT9D111_QVGA);
 		//wrSensorRegs8_16(MT9D111_RGB565);
 		wrSensorRegs8_16(default_size_a_list);
@@ -246,10 +248,11 @@ void initCam(void)
 		wrReg16(0xC6, 0xA103); //SEQ_CMD
 		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
 		//wrReg16(0xA4,(1<<5));//dithering
-		wrReg16(0xF0,2);//page 2
+		wrReg16(0xF0,2);//pagevv 2
 		wrReg16(0x0D,0);
 		wrReg16(0xF0,0);//page 0
-		wrReg16(0x0A,4);
+		//wrReg16(0x0A,4|(1<<4));//give each pixel N cyles or 2N cyles if 1 ADC 
+		wrSensorRegs8_16(default_size_a_list);
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider

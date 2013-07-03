@@ -295,7 +295,7 @@ void menu(void)
 				#endif
 				if(reso){
 					#ifdef MT9D111
-						wrSensorRegs8_16(default_size_b_list);
+						wrSensorRegs8_16(default_size_a_list);
 					#else
 					setRes(qvga);
 					#endif
@@ -306,7 +306,7 @@ void menu(void)
 				}else{
 					//setRes(vga);
 					#ifdef MT9D111
-						wrSensorRegs8_16(default_size_a_list);
+						wrSensorRegs8_16(default_size_b_list);
 					#endif
 					#ifdef ov7670
 						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
