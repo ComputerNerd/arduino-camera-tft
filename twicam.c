@@ -243,7 +243,7 @@ void initCam(void)
 		//_delay_ms(1000);
 		//wrSensorRegs8_16(MT9D111_QVGA);
 		//wrSensorRegs8_16(MT9D111_RGB565);
-		wrSensorRegs8_16(default_size_a_list);
+		//wrSensorRegs8_16(default_size_a_list);
 		wrReg16(0xF0,1);//page 1
 		wrReg16(0xC6, 0xA103); //SEQ_CMD
 		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
@@ -253,6 +253,7 @@ void initCam(void)
 		wrReg16(0xF0,0);//page 0
 		//wrReg16(0x0A,4|(1<<4));//give each pixel N cyles or 2N cyles if 1 ADC 
 		wrSensorRegs8_16(default_size_a_list);
+		//wrSensorRegs8_16P(MT9D111_refresh);
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider

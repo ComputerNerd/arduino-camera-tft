@@ -75,263 +75,276 @@ const struct regval_listP MT9D111_init[] PROGMEM=
 
 
 //[MT9D111 (SOC2010) Register Wizard Defaults]
-{0, 0x05, 0x12F6},				//HBLANK (B) = 4854
-{0, 0x06, 0x000B},				//VBLANK (B) = 11
-{0, 0x07, 0x0977},				//HBLANK (A) = 2423
-{0, 0x08, 0x000B},				//VBLANK (A) = 11
-{0, 0x20, 0x0300},				//Read Mode (B) = 768
-{0, 0x21, 0x8400},				//Read Mode (A) = 33792
-{0, 0x66, 0x1000},				//PLL Control 1 = 4096
-{0, 0x67, 0x507},				//PLL Control 2 = 1287
-{0, 0x65, 0xA000},				//Clock CNTRL: PLL ON = 40960
-{0, 0x65, 0x2000},				//Clock CNTRL: USE PLL = 8192
+	{0, 0x05, 0x12F6},				//HBLANK (B) = 4854
+	{0, 0x06, 0x000B},				//VBLANK (B) = 11
+	{0, 0x07, 0x0977},				//HBLANK (A) = 2423
+	{0, 0x08, 0x000B},				//VBLANK (A) = 11
+	{0, 0x20, 0x0300},				//Read Mode (B) = 768
+	{0, 0x21, 0x8400},				//Read Mode (A) = 33792
+	{0, 0x66, 0x1000},				//PLL Control 1 = 4096
+	{0, 0x67, 0x507},				//PLL Control 2 = 1287
+	{0, 0x65, 0xA000},				//Clock CNTRL: PLL ON = 40960
+	{0, 0x65, 0x2000},				//Clock CNTRL: USE PLL = 8192
 
 
-//Sequencer States...
+	//Sequencer States...
 
-{1, 0xC6, 0xA122},				//Enter Preview: Auto Exposure
-{1, 0xC8, 0x01},				//      = 1
-{1, 0xC6, 0xA123},				//Enter Preview: Flicker Detection
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA124},				//Enter Preview: Auto White Balance
-{1, 0xC8, 0x01},				//      = 1
-{1, 0xC6, 0xA125},				//Enter Preview: Auto Focus
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA126},				//Enter Preview: Histogram
-{1, 0xC8, 0x01},				//      = 1
-{1, 0xC6, 0xA127},				//Enter Preview: Strobe Control
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA128},				//Enter Preview: Skip Control
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA129},				//In Preview: Auto Exposure
-{1, 0xC8, 0x03},				//      = 3
-{1, 0xC6, 0xA12A},				//In Preview: Flicker Detection
-{1, 0xC8, 0x02},				//      = 2
-{1, 0xC6, 0xA12B},				//In Preview: Auto White Balance
-{1, 0xC8, 0x03},				//      = 3
-{1, 0xC6, 0xA12C},				//In Preview: Auto Focus
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA12D},				//In Preview: Histogram
-{1, 0xC8, 0x03},				//      = 3
-{1, 0xC6, 0xA12E},				//In Preview: Strobe Control
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA12F},				//In Preview: Skip Control
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA130},				//Exit Preview: Auto Exposure
-{1, 0xC8, 0x04},				//      = 4
-{1, 0xC6, 0xA131},				//Exit Preview: Flicker Detection
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA132},				//Exit Preview: Auto White Balance
-{1, 0xC8, 0x01},				//      = 1
-{1, 0xC6, 0xA133},				//Exit Preview: Auto Focus
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA134},				//Exit Preview: Histogram
-{1, 0xC8, 0x01},				//      = 1
-{1, 0xC6, 0xA135},				//Exit Preview: Strobe Control
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA136},				//Exit Preview: Skip Control
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA137},                //Capture: Auto Exposure
-{1, 0xC8, 0x03},                //      = 3
-{1, 0xC6, 0xA138},				//Capture: Flicker Detection
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA139},				//Capture: Auto White Balance
-{1, 0xC8, 0x03},				//      = 3
-{1, 0xC6, 0xA13A},				//Capture: Auto Focus
-{1, 0xC8, 0x00},				//      = 0
-{1, 0xC6, 0xA13B},				//Capture: Histogram
-{1, 0xC8, 0x03},				//      = 3
-{1, 0xC6, 0xA13C},				//Capture: Strobe Control
-{1, 0xC8, 0x00},        //      = 0
-{1, 0xC6, 0xA13D},				//Capture: Skip Control
-{1, 0xC8, 0x00},				//      = 0
-
-
-{1, 0xC6, 0x2703},				//Output Width (A)
-{1, 0xC8, 0x0320},        //      = 800
-{1, 0xC6, 0x2705},				//Output Height (A)
-{1, 0xC8, 0x0258},				//      = 600
-{1, 0xC6, 0x2707},				//Output Width (B)
-{1, 0xC8, 0x0640},				//      = 1600
-{1, 0xC6, 0x2709},				//Output Height (B)
-{1, 0xC8, 0x04B0},				//      = 1200
-{1, 0xC6, 0x270B},				//mode_config
-{1, 0xC8, 0x0030},				//      = 48
-{1, 0xC6, 0x270F},				//Row Start (A)
-{1, 0xC8, 0x01C},				//      = 28
-{1, 0xC6, 0x2711},				//Column Start (A)
-{1, 0xC8, 0x03C},				//      = 60
-{1, 0xC6, 0x2713},				//Row Height (A)
-{1, 0xC8, 0x4B0},				//      = 1200
-{1, 0xC6, 0x2715},				//Column Width (A)
-{1, 0xC8, 0x640},				//      = 1600
-{1, 0xC6, 0x2717},				//Extra Delay (A)
-{1, 0xC8, 0x00B},				//      = 11
-{1, 0xC6, 0x2719},                //Row Speed (A)
-{1, 0xC8, 0x0011},				//      = 17
-{1, 0xC6, 0x271B},				//Row Start (B)
-{1, 0xC8, 0x01C},				//      = 28
-{1, 0xC6, 0x271D},				//Column Start (B)
-{1, 0xC8, 0x03C},				//      = 60
-{1, 0xC6, 0x271F},				//Row Height (B)
-{1, 0xC8, 0x4B0},				//      = 1200
-{1, 0xC6, 0x2721},				//Column Width (B)
-{1, 0xC8, 0x640},				//= 1600
-{1, 0xC6, 0x2723},				//Extra Delay (B)
-{1, 0xC8, 0x000},				//      = 0
-{1, 0xC6, 0x2725},				//Row Speed (B)
-{1, 0xC8, 0x0011},				//      = 17
-{1, 0xC6, 0x2727},				//Crop_X0 (A)
-{1, 0xC8, 0x0000},				//      = 0
-{1, 0xC6, 0x2729},				//Crop_X1 (A)
-{1, 0xC8, 0x0320},				//      = 800
-{1, 0xC6, 0x272B},				//Crop_Y0 (A)
-{1, 0xC8, 0x0000},		//      = 0
-{1, 0xC6, 0x272D},		//Crop_Y1 (A)
-{1, 0xC8, 0x0258},		//      = 600
-{1, 0xC6, 0x2735},        //Crop_X0 (B)
-{1, 0xC8, 0x0000},        //      = 0
-{1, 0xC6, 0x2737},        //Crop_X1 (B)
-{1, 0xC8, 0x0640},        //      = 1600
-{1, 0xC6, 0x2739},        //Crop_Y0 (B)
-{1, 0xC8, 0x0000},        //      = 0
-{1, 0xC6, 0x273B},        //Crop_Y1 (B)
-{1, 0xC8, 0x04B0},        //      = 1200
-{1, 0xC6, 0xA743},        //Gamma and Contrast Settings (A)
-{1, 0xC8, 0x42},        //      = 66
-{1, 0xC6, 0xA744},        //Gamma and Contrast Settings (B)
-{1, 0xC8, 0x42},        //      = 66
+	{1, 0xC6, 0xA122},				//Enter Preview: Auto Exposure
+	{1, 0xC8, 0x01},				//      = 1
+	{1, 0xC6, 0xA123},				//Enter Preview: Flicker Detection
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA124},				//Enter Preview: Auto White Balance
+	{1, 0xC8, 0x01},				//      = 1
+	{1, 0xC6, 0xA125},				//Enter Preview: Auto Focus
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA126},				//Enter Preview: Histogram
+	{1, 0xC8, 0x01},				//      = 1
+	{1, 0xC6, 0xA127},				//Enter Preview: Strobe Control
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA128},				//Enter Preview: Skip Control
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA129},				//In Preview: Auto Exposure
+	{1, 0xC8, 0x03},				//      = 3
+	{1, 0xC6, 0xA12A},				//In Preview: Flicker Detection
+	{1, 0xC8, 0x02},				//      = 2
+	{1, 0xC6, 0xA12B},				//In Preview: Auto White Balance
+	{1, 0xC8, 0x03},				//      = 3
+	{1, 0xC6, 0xA12C},				//In Preview: Auto Focus
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA12D},				//In Preview: Histogram
+	{1, 0xC8, 0x03},				//      = 3
+	{1, 0xC6, 0xA12E},				//In Preview: Strobe Control
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA12F},				//In Preview: Skip Control
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA130},				//Exit Preview: Auto Exposure
+	{1, 0xC8, 0x04},				//      = 4
+	{1, 0xC6, 0xA131},				//Exit Preview: Flicker Detection
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA132},				//Exit Preview: Auto White Balance
+	{1, 0xC8, 0x01},				//      = 1
+	{1, 0xC6, 0xA133},				//Exit Preview: Auto Focus
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA134},				//Exit Preview: Histogram
+	{1, 0xC8, 0x01},				//      = 1
+	{1, 0xC6, 0xA135},				//Exit Preview: Strobe Control
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA136},				//Exit Preview: Skip Control
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA137},                //Capture: Auto Exposure
+	{1, 0xC8, 0x03},                //      = 3
+	{1, 0xC6, 0xA138},				//Capture: Flicker Detection
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA139},				//Capture: Auto White Balance
+	{1, 0xC8, 0x03},				//      = 3
+	{1, 0xC6, 0xA13A},				//Capture: Auto Focus
+	{1, 0xC8, 0x00},				//      = 0
+	{1, 0xC6, 0xA13B},				//Capture: Histogram
+	{1, 0xC8, 0x03},				//      = 3
+	{1, 0xC6, 0xA13C},				//Capture: Strobe Control
+	{1, 0xC8, 0x00},        //      = 0
+	{1, 0xC6, 0xA13D},				//Capture: Skip Control
+	{1, 0xC8, 0x00},				//      = 0
 
 
-//Custom gamma tables...
-
-{1, 0xC6, 0xA745},        //Gamma Table 0 (A)
-{1, 0xC8, 0x00},        //      = 0
-{1, 0xC6, 0xA746},        //Gamma Table 1 (A)
-{1, 0xC8, 0x14},        //      = 20
-{1, 0xC6, 0xA747},        //Gamma Table 2 (A)
-{1, 0xC8, 0x23},        //      = 35
-{1, 0xC6, 0xA748},        //Gamma Table 3 (A)
-{1, 0xC8, 0x3A},        //      = 58
-{1, 0xC6, 0xA749},        //Gamma Table 4 (A)
-{1, 0xC8, 0x5E},        //      = 94
-{1, 0xC6, 0xA74A},        //Gamma Table 5 (A)
-{1, 0xC8, 0x76},        //      = 118
-{1, 0xC6, 0xA74B},        //Gamma Table 6 (A)
-{1, 0xC8, 0x88},        //      = 136
-{1, 0xC6, 0xA74C},        //Gamma Table 7 (A)
-{1, 0xC8, 0x96},        //      = 150
-{1, 0xC6, 0xA74D},        //Gamma Table 8 (A)
-{1, 0xC8, 0xA3},        //      = 163
-{1, 0xC6, 0xA74E},        //Gamma Table 9 (A)
-{1, 0xC8, 0xAF},        //      = 175
-{1, 0xC6, 0xA74F},        //Gamma Table 10 (A)
-{1, 0xC8, 0xBA},        //      = 186
-{1, 0xC6, 0xA750},        //Gamma Table 11 (A)
-{1, 0xC8, 0xC4},        //      = 196
-{1, 0xC6, 0xA751},        //Gamma Table 12 (A)
-{1, 0xC8, 0xCE},        //      = 206
-{1, 0xC6, 0xA752},        //Gamma Table 13 (A)
-{1, 0xC8, 0xD7},        //      = 215
-{1, 0xC6, 0xA753},        //Gamma Table 14 (A)
-{1, 0xC8, 0xE0},        //      = 224
-{1, 0xC6, 0xA754},        //Gamma Table 15 (A)
-{1, 0xC8, 0xE8},        //      = 232
-{1, 0xC6, 0xA755},        //Gamma Table 16 (A)
-{1, 0xC8, 0xF0},        //      = 240
-{1, 0xC6, 0xA756},        //Gamma Table 17 (A)
-{1, 0xC8, 0xF8},        //      = 248
-{1, 0xC6, 0xA757},        //Gamma Table 18 (A)
-{1, 0xC8, 0xFF},        //      = 255
-{1, 0xC6, 0xA758},        //Gamma Table 0 (B)
-{1, 0xC8, 0x00},        //      = 0
-{1, 0xC6, 0xA759},        //Gamma Table 1 (B)
-{1, 0xC8, 0x14},        //      = 20
-{1, 0xC6, 0xA75A},        //Gamma Table 2 (B)
-{1, 0xC8, 0x23},        //      = 35
-{1, 0xC6, 0xA75B},        //Gamma Table 3 (B)
-{1, 0xC8, 0x3A},        //      = 58
-{1, 0xC6, 0xA75C},        //Gamma Table 4 (B)
-{1, 0xC8, 0x5E},        //      = 94
-{1, 0xC6, 0xA75D},        //Gamma Table 5 (B)
-{1, 0xC8, 0x76},        //      = 118
-{1, 0xC6, 0xA75E},        //Gamma Table 6 (B)
-{1, 0xC8, 0x88},        //      = 136
-{1, 0xC6, 0xA75F},        //Gamma Table 7 (B)
-{1, 0xC8, 0x96},        //      = 150
-{1, 0xC6, 0xA760},        //Gamma Table 8 (B)
-{1, 0xC8, 0xA3},        //      = 163
-{1, 0xC6, 0xA761},        //Gamma Table 9 (B)
-{1, 0xC8, 0xAF},        //      = 175
-{1, 0xC6, 0xA762},        //Gamma Table 10 (B)
-{1, 0xC8, 0xBA},        //      = 186
-{1, 0xC6, 0xA763},        //Gamma Table 11 (B)
-{1, 0xC8, 0xC4},        //      = 196
-{1, 0xC6, 0xA764},        //Gamma Table 12 (B)
-{1, 0xC8, 0xCE},        //      = 206
-{1, 0xC6, 0xA765},        //Gamma Table 13 (B)
-{1, 0xC8, 0xD7},        //      = 215
-{1, 0xC6, 0xA766},        //Gamma Table 14 (B)
-{1, 0xC8, 0xE0},        //      = 224
-{1, 0xC6, 0xA767},        //Gamma Table 15 (B)
-{1, 0xC8, 0xE8},        //      = 232
-{1, 0xC6, 0xA768},        //Gamma Table 16 (B)
-{1, 0xC8, 0xF0},        //      = 240
-{1, 0xC6, 0xA769},        //Gamma Table 17 (B)
-{1, 0xC8, 0xF8},        //      = 248
-{1, 0xC6, 0xA76A},        //Gamma Table 18 (B)
-{1, 0xC8, 0xFF},        //      = 255
+	{1, 0xC6, 0x2703},				//Output Width (A)
+	{1, 0xC8, 0x0320},        //      = 800
+	{1, 0xC6, 0x2705},				//Output Height (A)
+	{1, 0xC8, 0x0258},				//      = 600
+	{1, 0xC6, 0x2707},				//Output Width (B)
+	{1, 0xC8, 0x0640},				//      = 1600
+	{1, 0xC6, 0x2709},				//Output Height (B)
+	{1, 0xC8, 0x04B0},				//      = 1200
+	{1, 0xC6, 0x270B},				//mode_config
+	{1, 0xC8, 0x0030},				//      = 48
+	{1, 0xC6, 0x270F},				//Row Start (A)
+	{1, 0xC8, 0x01C},				//      = 28
+	{1, 0xC6, 0x2711},				//Column Start (A)
+	{1, 0xC8, 0x03C},				//      = 60
+	{1, 0xC6, 0x2713},				//Row Height (A)
+	{1, 0xC8, 0x4B0},				//      = 1200
+	{1, 0xC6, 0x2715},				//Column Width (A)
+	{1, 0xC8, 0x640},				//      = 1600
+	{1, 0xC6, 0x2717},				//Extra Delay (A)
+	{1, 0xC8, 0x00B},				//      = 11
+	{1, 0xC6, 0x2719},                //Row Speed (A)
+	{1, 0xC8, 0x0011},				//      = 17
+	{1, 0xC6, 0x271B},				//Row Start (B)
+	{1, 0xC8, 0x01C},				//      = 28
+	{1, 0xC6, 0x271D},				//Column Start (B)
+	{1, 0xC8, 0x03C},				//      = 60
+	{1, 0xC6, 0x271F},				//Row Height (B)
+	{1, 0xC8, 0x4B0},				//      = 1200
+	{1, 0xC6, 0x2721},				//Column Width (B)
+	{1, 0xC8, 0x640},				//= 1600
+	{1, 0xC6, 0x2723},				//Extra Delay (B)
+	{1, 0xC8, 0x000},				//      = 0
+	{1, 0xC6, 0x2725},				//Row Speed (B)
+	{1, 0xC8, 0x0011},				//      = 17
+	{1, 0xC6, 0x2727},				//Crop_X0 (A)
+	{1, 0xC8, 0x0000},				//      = 0
+	{1, 0xC6, 0x2729},				//Crop_X1 (A)
+	{1, 0xC8, 0x0320},				//      = 800
+	{1, 0xC6, 0x272B},				//Crop_Y0 (A)
+	{1, 0xC8, 0x0000},		//      = 0
+	{1, 0xC6, 0x272D},		//Crop_Y1 (A)
+	{1, 0xC8, 0x0258},		//      = 600
+	{1, 0xC6, 0x2735},        //Crop_X0 (B)
+	{1, 0xC8, 0x0000},        //      = 0
+	{1, 0xC6, 0x2737},        //Crop_X1 (B)
+	{1, 0xC8, 0x0640},        //      = 1600
+	{1, 0xC6, 0x2739},        //Crop_Y0 (B)
+	{1, 0xC8, 0x0000},        //      = 0
+	{1, 0xC6, 0x273B},        //Crop_Y1 (B)
+	{1, 0xC8, 0x04B0},        //      = 1200
+	{1, 0xC6, 0xA743},        //Gamma and Contrast Settings (A)
+	{1, 0xC8, 0x42},        //      = 66
+	{1, 0xC6, 0xA744},        //Gamma and Contrast Settings (B)
+	{1, 0xC8, 0x42},        //      = 66
 
 
-{1, 0xC6, 0x276D},        //FIFO_Conf1 (A)
-{1, 0xC8, 0xE0E2},        //      = 57570
-{1, 0xC6, 0xA76F},        //FIFO_Conf2 (A)
-{1, 0xC8, 0xE1},        //      = 225
-{1, 0xC6, 0x2774},        //FIFO_Conf1 (B)
-{1, 0xC8, 0xE0E1},        //      = 57569
-{1, 0xC6, 0xA776},        //FIFO_Conf2 (B)
-{1, 0xC8, 0xE1},        //      = 225
-{1, 0xC6, 0x220B},        //Max R12 (B)(Shutter Delay)
-{1, 0xC8, 0x1284},        //      = 4740
-{1, 0xC6, 0xA217},        //IndexTH23
-{1, 0xC8, 0x08},        //      = 8
-{1, 0xC6, 0x2228},        //RowTime (msclk per)/4
-{1, 0xC8, 0x064B},        //      = 1611
-{1, 0xC6, 0x222F},        //R9 Step
-{1, 0xC8, 0x0005},        //      = 5
-{1, 0xC6, 0xA408},        //search_f1_50
-{1, 0xC8, 0x00},        //      = 0
-{1, 0xC6, 0xA409},        //search_f2_50
-{1, 0xC8, 0x02},        //      = 2
-{1, 0xC6, 0xA40A},        //search_f1_60
-{1, 0xC8, 0x00},        //      = 0
-{1, 0xC6, 0xA40B},        //search_f2_60
-{1, 0xC8, 0x02},        //      = 2
-{1, 0xC6, 0x2411},        //R9_Step_60
-{1, 0xC8, 0x0005},        //      = 5
-{1, 0xC6, 0x2413},        //R9_Step_50
-{1, 0xC8, 0x0006},        //      = 6
-{MT9D111_DELAY, 0x00, 500},
-{1, 0xC6, 0xA103},        //Refresh Sequencer Mode
-{1, 0xC8, 0x06},        //      = 6
-{MT9D111_DELAY, 0x00, 500},
-{1, 0xC6, 0xA103},        //Refresh Sequencer
-{1, 0xC8, 0x05},        //      = 5
-{EndRegs_MT9D111, 0xFF, 0xFFFF }
+	//Custom gamma tables...
+
+	{1, 0xC6, 0xA745},        //Gamma Table 0 (A)
+	{1, 0xC8, 0x00},        //      = 0
+	{1, 0xC6, 0xA746},        //Gamma Table 1 (A)
+	{1, 0xC8, 0x14},        //      = 20
+	{1, 0xC6, 0xA747},        //Gamma Table 2 (A)
+	{1, 0xC8, 0x23},        //      = 35
+	{1, 0xC6, 0xA748},        //Gamma Table 3 (A)
+	{1, 0xC8, 0x3A},        //      = 58
+	{1, 0xC6, 0xA749},        //Gamma Table 4 (A)
+	{1, 0xC8, 0x5E},        //      = 94
+	{1, 0xC6, 0xA74A},        //Gamma Table 5 (A)
+	{1, 0xC8, 0x76},        //      = 118
+	{1, 0xC6, 0xA74B},        //Gamma Table 6 (A)
+	{1, 0xC8, 0x88},        //      = 136
+	{1, 0xC6, 0xA74C},        //Gamma Table 7 (A)
+	{1, 0xC8, 0x96},        //      = 150
+	{1, 0xC6, 0xA74D},        //Gamma Table 8 (A)
+	{1, 0xC8, 0xA3},        //      = 163
+	{1, 0xC6, 0xA74E},        //Gamma Table 9 (A)
+	{1, 0xC8, 0xAF},        //      = 175
+	{1, 0xC6, 0xA74F},        //Gamma Table 10 (A)
+	{1, 0xC8, 0xBA},        //      = 186
+	{1, 0xC6, 0xA750},        //Gamma Table 11 (A)
+	{1, 0xC8, 0xC4},        //      = 196
+	{1, 0xC6, 0xA751},        //Gamma Table 12 (A)
+	{1, 0xC8, 0xCE},        //      = 206
+	{1, 0xC6, 0xA752},        //Gamma Table 13 (A)
+	{1, 0xC8, 0xD7},        //      = 215
+	{1, 0xC6, 0xA753},        //Gamma Table 14 (A)
+	{1, 0xC8, 0xE0},        //      = 224
+	{1, 0xC6, 0xA754},        //Gamma Table 15 (A)
+	{1, 0xC8, 0xE8},        //      = 232
+	{1, 0xC6, 0xA755},        //Gamma Table 16 (A)
+	{1, 0xC8, 0xF0},        //      = 240
+	{1, 0xC6, 0xA756},        //Gamma Table 17 (A)
+	{1, 0xC8, 0xF8},        //      = 248
+	{1, 0xC6, 0xA757},        //Gamma Table 18 (A)
+	{1, 0xC8, 0xFF},        //      = 255
+	{1, 0xC6, 0xA758},        //Gamma Table 0 (B)
+	{1, 0xC8, 0x00},        //      = 0
+	{1, 0xC6, 0xA759},        //Gamma Table 1 (B)
+	{1, 0xC8, 0x14},        //      = 20
+	{1, 0xC6, 0xA75A},        //Gamma Table 2 (B)
+	{1, 0xC8, 0x23},        //      = 35
+	{1, 0xC6, 0xA75B},        //Gamma Table 3 (B)
+	{1, 0xC8, 0x3A},        //      = 58
+	{1, 0xC6, 0xA75C},        //Gamma Table 4 (B)
+	{1, 0xC8, 0x5E},        //      = 94
+	{1, 0xC6, 0xA75D},        //Gamma Table 5 (B)
+	{1, 0xC8, 0x76},        //      = 118
+	{1, 0xC6, 0xA75E},        //Gamma Table 6 (B)
+	{1, 0xC8, 0x88},        //      = 136
+	{1, 0xC6, 0xA75F},        //Gamma Table 7 (B)
+	{1, 0xC8, 0x96},        //      = 150
+	{1, 0xC6, 0xA760},        //Gamma Table 8 (B)
+	{1, 0xC8, 0xA3},        //      = 163
+	{1, 0xC6, 0xA761},        //Gamma Table 9 (B)
+	{1, 0xC8, 0xAF},        //      = 175
+	{1, 0xC6, 0xA762},        //Gamma Table 10 (B)
+	{1, 0xC8, 0xBA},        //      = 186
+	{1, 0xC6, 0xA763},        //Gamma Table 11 (B)
+	{1, 0xC8, 0xC4},        //      = 196
+	{1, 0xC6, 0xA764},        //Gamma Table 12 (B)
+	{1, 0xC8, 0xCE},        //      = 206
+	{1, 0xC6, 0xA765},        //Gamma Table 13 (B)
+	{1, 0xC8, 0xD7},        //      = 215
+	{1, 0xC6, 0xA766},        //Gamma Table 14 (B)
+	{1, 0xC8, 0xE0},        //      = 224
+	{1, 0xC6, 0xA767},        //Gamma Table 15 (B)
+	{1, 0xC8, 0xE8},        //      = 232
+	{1, 0xC6, 0xA768},        //Gamma Table 16 (B)
+	{1, 0xC8, 0xF0},        //      = 240
+	{1, 0xC6, 0xA769},        //Gamma Table 17 (B)
+	{1, 0xC8, 0xF8},        //      = 248
+	{1, 0xC6, 0xA76A},        //Gamma Table 18 (B)
+	{1, 0xC8, 0xFF},        //      = 255
+
+
+	{1, 0xC6, 0x276D},        //FIFO_Conf1 (A)
+	{1, 0xC8, 0xE0E2},        //      = 57570
+	{1, 0xC6, 0xA76F},        //FIFO_Conf2 (A)
+	{1, 0xC8, 0xE1},        //      = 225
+	{1, 0xC6, 0x2774},        //FIFO_Conf1 (B)
+	{1, 0xC8, 0xE0E1},        //      = 57569
+	{1, 0xC6, 0xA776},        //FIFO_Conf2 (B)
+	{1, 0xC8, 0xE1},        //      = 225
+	{1, 0xC6, 0x220B},        //Max R12 (B)(Shutter Delay)
+	{1, 0xC8, 0x1284},        //      = 4740
+	{1, 0xC6, 0xA217},        //IndexTH23
+	{1, 0xC8, 0x08},        //      = 8
+	{1, 0xC6, 0x2228},        //RowTime (msclk per)/4
+	{1, 0xC8, 0x064B},        //      = 1611
+	{1, 0xC6, 0x222F},        //R9 Step
+	{1, 0xC8, 0x0005},        //      = 5
+	{1, 0xC6, 0xA408},        //search_f1_50
+	{1, 0xC8, 0x00},        //      = 0
+	{1, 0xC6, 0xA409},        //search_f2_50
+	{1, 0xC8, 0x02},        //      = 2
+	{1, 0xC6, 0xA40A},        //search_f1_60
+	{1, 0xC8, 0x00},        //      = 0
+	{1, 0xC6, 0xA40B},        //search_f2_60
+	{1, 0xC8, 0x02},        //      = 2
+	{1, 0xC6, 0x2411},        //R9_Step_60
+	{1, 0xC8, 0x0005},        //      = 5
+	{1, 0xC6, 0x2413},        //R9_Step_50
+	{1, 0xC8, 0x0006},        //      = 6
+	{MT9D111_DELAY, 0x00, 500},
+	{1, 0xC6, 0xA103},        //Refresh Sequencer Mode
+	{1, 0xC8, 0x06},        //      = 6
+	{MT9D111_DELAY, 0x00, 500},
+	{1, 0xC6, 0xA103},        //Refresh Sequencer
+	{1, 0xC8, 0x05},        //      = 5
+	{EndRegs_MT9D111, 0xFF, 0xFFFF }
+};
+
+const struct regval_listP MT9D111_refresh[] PROGMEM={
+	{1, 0xC6, 0xA103},        //Refresh Sequencer Mode
+	{1, 0xC8, 0x06},        //      = 6
+	{MT9D111_DELAY, 0x00, 500},
+	{1, 0xC6, 0xA103},        //Refresh Sequencer
+	{1, 0xC8, 0x05},        //      = 5
+	{EndRegs_MT9D111, 0xFF, 0xFFFF }
 };
 
 const struct regval_list default_size_a_list[] PROGMEM =
 {
-	{0xf0, 0x1},       
-	{0xC6, 0xA103	}, //SEQ_CMD
-	{0xC8, 0x0001	}, //SEQ_CMD, Do Preview
+	{0xf0, 0x0},       
+	{0xF2,0x0000},
+	{0x07,0x00AE},
+	{0x08,0x0010},
+	{0x21,0x0490},
 	{0xff, 0xffff }
 };
 const struct regval_list default_size_b_list[] PROGMEM =
 {
-	{0xf0, 0x1},  
-	{0xC6, 0xA103	}, //SEQ_CMD
-	{0xC8, 0x0002	}, //SEQ_CMD, Do capture
+	{0xf0, 0x0},  
+	{0xF2,0x000B},
+	{0x05,0x015C},
+	{0x06,0x0020},
+	{0x20,0x0020},
 	{0xff, 0xffff }
 };
 // For QVGA ( 320 x 240) on 3BA module
