@@ -118,7 +118,7 @@ This is heavily based on seeed's library but is ported to avr-gcc
 extern unsigned char simpleFont[][8];
 
 void tft_pushData(unsigned char data);
-void tft_setOrientation(unsigned int HV);
+void tft_setOrientation(uint8_t HV);
 unsigned char tft_getData(void);
 void tft_sendData(unsigned int data);
 void tft_setXY(unsigned int poX, unsigned int poY);
@@ -127,7 +127,7 @@ void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,unsigned int color
 void tft_fillRectangle(unsigned int poX, unsigned int poY, unsigned int length, unsigned int width, unsigned int color);
 void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);
 void tft_drawHorizontalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);
-void tft_drawChar(unsigned char ascii,unsigned int poX, unsigned int poY,unsigned int size, unsigned int fgcolor);
+void tft_drawChar(unsigned char ascii,uint16_t poX, uint16_t poY,uint8_t size, uint16_t fgcolor);
 void tft_drawString(char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor);
 void tft_drawStringP(const char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor);
 void tft_paintScreenBlack(void);

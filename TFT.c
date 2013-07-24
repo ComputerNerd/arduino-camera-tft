@@ -90,7 +90,7 @@ void tft_exitStandBy(void)
     tft_sendCommand(0x0007);
     tft_sendData(0x0133);
 }
-void tft_setOrientation(unsigned int HV)//horizontal or vertical
+void tft_setOrientation(uint8_t HV)//horizontal or vertical
 {
     tft_sendCommand(0x03);
     if(HV==1)//vertical
@@ -113,7 +113,7 @@ uint8_t tft_getData(void)
 }
 unsigned int tft_readRegister(unsigned int index)
 {
-    unsigned int data=0;
+    unsigned int data;
 
     CS_LOW;
     RS_LOW;
@@ -135,7 +135,7 @@ unsigned int tft_readRegister(unsigned int index)
 
     RD_LOW;
     RD_HIGH;
-    data |= tft_getData()<<8;
+    data = tft_getData()<<8;
 
     RD_LOW;
     RD_HIGH;
@@ -167,14 +167,14 @@ void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length
 	for(i=0;i<length;++i)
 		tft_sendData(color);
 }
-void tft_drawHorizontalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color)
+void tft_drawHorizontalLine(uint16_t poX, uint16_t poY,uint16_t length,uint16_t color)
 {
     tft_setXY(poX,poY);
     tft_setOrientation(0);
     if(length+poX>MAX_X)
         length=MAX_X-poX;
     uint16_t i;
-	for(i=0;i<length;i++)
+	for(i=0;i<length;++i)
 		tft_sendData(color);
 }
 inline void tft_setPixel(unsigned int poX, unsigned int poY,unsigned int color)
@@ -189,7 +189,7 @@ void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,unsigned int color
     int dx = abs(x), sx = x0<x1 ? 1 : -1;
     int dy = -abs(y), sy = y0<y1 ? 1 : -1;
     int err = dx+dy, e2; /* error value e_xy */
-    for (;;){ /* loop */
+    while (1){ /* loop */
         tft_setPixel(x0,y0,color);
         e2 = 2*err;
         if (e2 >= dy) { /* e_xy+e_x > 0 */
@@ -202,7 +202,7 @@ void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,unsigned int color
         }
     }
 }
-void tft_fillRectangle(unsigned int poX, unsigned int poY, unsigned int length, unsigned int width, unsigned int color)
+void tft_fillRectangle(uint16_t poX, uint16_t poY, uint16_t length, uint16_t width, uint16_t color)
 {
 	uint16_t i;
 	for(i=0;i<width;i++){
@@ -216,7 +216,7 @@ void tft_fillRectangle(unsigned int poX, unsigned int poY, unsigned int length, 
 			tft_drawHorizontalLine(poX, poY+i, length, color);    
 	}
 }
-void tft_drawChar(unsigned char ascii,unsigned int poX, unsigned int poY,unsigned int size, unsigned int fgcolor)
+void tft_drawChar(unsigned char ascii,uint16_t poX, uint16_t poY,uint8_t size, uint16_t fgcolor)
 {
 	tft_setXY(poX,poY);   
 	if((ascii < 0x20)||(ascii > 0x7e))//Unsupported char.
@@ -263,8 +263,7 @@ void tft_drawString(char *string,unsigned int poX, unsigned int poY,unsigned int
 }
 void tft_drawStringP(const char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor)
 {
-	while(pgm_read_byte_near(string))
-	{
+	while(pgm_read_byte_near(string)){
 		tft_drawChar(pgm_read_byte_near(string), poX, poY, size, fgcolor);
 		string++;
 		if(DisplayDirect == LEFT2RIGHT){
