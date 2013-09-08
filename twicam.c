@@ -274,8 +274,11 @@ void initCam(void)
 			wrSensorRegs8_8(ov7670_default_regs);
 		if(bayerUse!=2)
 			wrReg(0x1e,rdReg(0x1e)|(1<<5));//hflip
-		wrReg(REG_COM10,32);//pclk does not toggle on HBLANK
-		wrReg(REG_COM11,226);//enable night mode 1/8 frame rate COM11
+		if(bayerUse==1)
+			wrReg(REG_COM10,48);
+		else
+			wrReg(REG_COM10,32);//pclk does not toggle on HBLANK
+		wrReg(REG_COM11,98);
 	#else
 		#error "No sensor selected"
 	#endif

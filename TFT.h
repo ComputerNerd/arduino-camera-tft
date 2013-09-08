@@ -108,6 +108,9 @@ This is heavily based on seeed's library but is ported to avr-gcc
 #define RD_HIGH     {PORT_RD|=RD_BIT;}
 #define RD_LOW      {PORT_RD&=~RD_BIT;}
 #define RD_RISING   {PORT_RD|=RD_BIT;PORT_RD&=~RD_BIT;}
+
+#define RS_RD_HIGH	{DDR_RD|=RD_BIT|RS_BIT;}
+
 //========================================
 
 #endif

@@ -169,13 +169,36 @@ void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length
 }
 void tft_drawHorizontalLine(uint16_t poX, uint16_t poY,uint16_t length,uint16_t color)
 {
-    tft_setXY(poX,poY);
-    tft_setOrientation(0);
-    if(length+poX>MAX_X)
-        length=MAX_X-poX;
-    uint16_t i;
-	for(i=0;i<length;++i)
+	tft_setXY(poX,poY);
+	tft_setOrientation(0);
+	if(length+poX>MAX_X)
+		length=MAX_X-poX;
+	uint16_t i;
+	#ifdef MEGA
+		CS_LOW;
+		RS_HIGH;
+		RD_HIGH;
+		DDRA=0xFF;
+		uint8_t col1,col2;
+		col1=color>>8;
+		col2=color&255;
+	#endif
+	for(i=0;i<length;++i){
+		#ifdef SEEEDUINO
 		tft_sendData(color);
+		#endif
+		#ifdef MEGA
+			WR_LOW;
+			PORTA=col1;
+			WR_HIGH;
+			WR_LOW;
+			PORTA=col2;
+			WR_HIGH;
+		#endif
+	}
+	#ifdef MEGA
+		CS_HIGH;
+	#endif
 }
 inline void tft_setPixel(unsigned int poX, unsigned int poY,unsigned int color)
 {
@@ -304,10 +327,9 @@ void tft_paintScreenBlack(void)
 {
 	uint8_t i;
 	uint16_t f;
-	for(i=0;i<2;++i){
-		for(f=0;f<38400;++f){
-			tft_sendData(BLACK);
-		}
+	for(f=0;f<38400;++f){
+		tft_sendData(BLACK);
+		tft_sendData(BLACK);
 	}
 }
 void tft_init(void)
