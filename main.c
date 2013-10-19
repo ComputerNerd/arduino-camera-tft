@@ -16,16 +16,19 @@
 #include "selections.h"
 void menu(void);
 uint16_t leadingZeros(uint8_t x);
-//undocumented rgister 1F is called LAEC this means exposures less than one line
-void main(void)
-{
+//OV7670 undocumented rgister 1F is called LAEC this means exposures less than one line
+void main(void){
 	ADCSRA=(1<<ADEN)|(1<<ADPS2);//enable ADC
 	DDRL|=8;
 	ASSR &= ~(_BV(EXCLK) | _BV(AS2));
 	//generate 8mhz clock
 	TCCR5A=67;
 	TCCR5B=17;
-	OCR5A=0;// F_CPU/(2*(x+1))
+	#ifdef MT9D111
+	OCR5A=2;// F_CPU/(2*(x+1))
+	#else
+	OCR5A=0;
+	#endif
 	DDRC=0;
 	DDRG|=1<<5;
 	UBRR0H=0;
@@ -85,8 +88,7 @@ void redrawT(uint8_t z,uint8_t regD)
 	#endif
 }
 #ifdef MT9D111
-uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8)
-{
+uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8){
 	if(microEdit){
 		wrReg16(0xC6,address|(1<<13)|(maddr<<8)|(bitm8<<15));
 		return rdReg16(0xC8);
@@ -94,8 +96,7 @@ uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8)
 	else
 		return rdReg16(address);
 }
-uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16_t newVal,uint8_t maddr,uint8_t bitm8)
-{
+uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16_t newVal,uint8_t maddr,uint8_t bitm8){
 	if(write){
 		if(microEdit){
 			wrReg16(0xC6,address|(1<<13)|(maddr<<8)|(bitm8<<15));
@@ -116,7 +117,7 @@ void editRegs(void)
 	#ifdef MT9D111
 		uint16_t val;
 		wrReg16(0xF0,2);
-		if(rdReg16(0xD)!=0){
+		if(rdReg16(0x0D)!=0){
 			tft_fillRectangle(0,320,112,320,BLACK);
 			tft_drawStringP(PSTR("Warning 0x0D"),0,320,1,WHITE);
 			_delay_ms(1000);
@@ -125,12 +126,10 @@ void editRegs(void)
 	#else
 		uint8_t val;
 	#endif
-	uint8_t address=3;
+	uint8_t address=0x0D;
 	#ifdef MT9D111
 		uint8_t bitm8=0;
 		uint8_t maddr=0;
-	#endif
-	#ifdef MT9D111
 		redrawGUI(microedit);
 	#else
 		redrawGUI();
@@ -309,8 +308,7 @@ void editRegs(void)
 		}*/
 	}//end of loop
 }
-uint16_t leadingZeros(uint8_t x)
-{
+uint16_t leadingZeros(uint8_t x){
 	uint8_t len=strlen((const char *)buf);
 	uint16_t len2=320;
 	len=8-len;

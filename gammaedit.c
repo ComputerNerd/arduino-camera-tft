@@ -6,18 +6,15 @@
 #include <stdint.h>
 #include <util/delay.h>
 static uint8_t point=0;
-inline void graph(uint8_t y,uint8_t x,uint16_t col)
-{
+inline void graph(uint8_t y,uint8_t x,uint16_t col){
 	y=y*15/32;
 	tft_setXY(239-y,319-x);
 	tft_sendData(col);
 }
-uint16_t pickSel(uint8_t sel)
-{
+inline uint16_t pickSel(uint8_t sel){
 		return sel==point ? RED:WHITE;
 }
-void redrawGraph(void)
-{
+void redrawGraph(void){
 	#ifdef ov7670
 		graph(rdReg(0x7b),2,pickSel(0));
 		graph(rdReg(0x7c),4,pickSel(1));
@@ -54,8 +51,7 @@ void redrawGraph(void)
 		graph(256-(rdReg(0xA8)*3/4),120,GREEN);
 	#endif
 }
-void gammaEdit(void)
-{
+void gammaEdit(void){
 	uint16_t x,y,z;
 	#ifndef MT9D111
 	setRes(qqvga);//FIXME: add support for MT9D111 QQVGA
@@ -80,5 +76,4 @@ void gammaEdit(void)
 		redrawGraph();
 	}while(z<10);
 	setRes(qvga);
-	
 }

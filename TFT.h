@@ -32,40 +32,40 @@ This is heavily based on seeed's library but is ported to avr-gcc
 #ifdef SEEEDUINO
 
 //========================================
-#define DDR_CS      DDRB
-#define PORT_CS     PORTB
-#define CS_BIT      0x04
+#define DDR_CS	  DDRB
+#define PORT_CS	 PORTB
+#define CS_BIT	  0x04
 #define CS_OUTPUT   {DDR_CS|=CS_BIT;}
-#define CS_HIGH     {PORT_CS|=CS_BIT;}
-#define CS_LOW      {PORT_CS&=~CS_BIT;}
+#define CS_HIGH	 {PORT_CS|=CS_BIT;}
+#define CS_LOW	  {PORT_CS&=~CS_BIT;}
 
 //-----------------------------------------
 
-#define DDR_RS      DDRB
-#define PORT_RS     PORTB
-#define RS_BIT      0x08
+#define DDR_RS	  DDRB
+#define PORT_RS	 PORTB
+#define RS_BIT	  0x08
 #define RS_OUTPUT   {DDR_RS|=RS_BIT;}
-#define RS_HIGH     {PORT_RS|=RS_BIT;}
-#define RS_LOW      {PORT_RS&=~RS_BIT;}
+#define RS_HIGH	 {PORT_RS|=RS_BIT;}
+#define RS_LOW	  {PORT_RS&=~RS_BIT;}
 
 //-----------------------------------------
 
-#define DDR_WR      DDRB
-#define PORT_WR     PORTB
-#define WR_BIT      0x10
+#define DDR_WR	  DDRB
+#define PORT_WR	 PORTB
+#define WR_BIT	  0x10
 #define WR_OUTPUT   {DDR_WR|=WR_BIT;}
-#define WR_HIGH     {PORT_WR|=WR_BIT;}
-#define WR_LOW      {PORT_WR&=~WR_BIT;}
+#define WR_HIGH	 {PORT_WR|=WR_BIT;}
+#define WR_LOW	  {PORT_WR&=~WR_BIT;}
 #define WR_RISING   {PORT_WR|=WR_BIT;PORT_WR&=~WR_BIT;}
 
 //-----------------------------------------
 
-#define DDR_RD      DDRB
-#define PORT_RD     PORTB
-#define RD_BIT      0x20
+#define DDR_RD	  DDRB
+#define PORT_RD	 PORTB
+#define RD_BIT	  0x20
 #define RD_OUTPUT   {DDR_RD|=RD_BIT;}
-#define RD_HIGH     {PORT_RD|=RD_BIT;}
-#define RD_LOW      {PORT_RD&=~RD_BIT;}
+#define RD_HIGH	 {PORT_RD|=RD_BIT;}
+#define RD_LOW	  {PORT_RD&=~RD_BIT;}
 #define RD_RISING   {PORT_RD|=RD_BIT;PORT_RD&=~RD_BIT;}
 //========================================
 
@@ -73,40 +73,40 @@ This is heavily based on seeed's library but is ported to avr-gcc
 
 #ifdef MEGA
 //==================/CS=====================
-#define DDR_CS      DDRB
-#define PORT_CS     PORTB
-#define CS_BIT      0x10
+#define DDR_CS	  DDRB
+#define PORT_CS	 PORTB
+#define CS_BIT	  0x10
 #define CS_OUTPUT   {DDR_CS|=CS_BIT;}
-#define CS_HIGH     {PORT_CS|=CS_BIT;}
-#define CS_LOW      {PORT_CS&=~CS_BIT;}
+#define CS_HIGH	 {PORT_CS|=CS_BIT;}
+#define CS_LOW	  {PORT_CS&=~CS_BIT;}
 
 //------------------RS----------------------
 
-#define DDR_RS      DDRB
-#define PORT_RS     PORTB
-#define RS_BIT      0x20
+#define DDR_RS	  DDRB
+#define PORT_RS	 PORTB
+#define RS_BIT	  0x20
 #define RS_OUTPUT   {DDR_RS|=RS_BIT;}
-#define RS_HIGH     {PORT_RS|=RS_BIT;}
-#define RS_LOW      {PORT_RS&=~RS_BIT;}
+#define RS_HIGH	 {PORT_RS|=RS_BIT;}
+#define RS_LOW	  {PORT_RS&=~RS_BIT;}
 
 //------------------WR----------------------
 
-#define DDR_WR      DDRB
-#define PORT_WR     PORTB
-#define WR_BIT      0x40
+#define DDR_WR	  DDRB
+#define PORT_WR	 PORTB
+#define WR_BIT	  0x40
 #define WR_OUTPUT   {DDR_WR|=WR_BIT;}
-#define WR_HIGH     {PORT_WR|=WR_BIT;}
-#define WR_LOW      {PORT_WR&=~WR_BIT;}
+#define WR_HIGH	 {PORT_WR|=WR_BIT;}
+#define WR_LOW	  {PORT_WR&=~WR_BIT;}
 #define WR_RISING   {PORT_WR|=WR_BIT;PORT_WR&=~WR_BIT;}
 
 //------------------RD---------------------
 
-#define DDR_RD      DDRB
-#define PORT_RD     PORTB
-#define RD_BIT      0x80
+#define DDR_RD	  DDRB
+#define PORT_RD	 PORTB
+#define RD_BIT	  0x80
 #define RD_OUTPUT   {DDR_RD|=RD_BIT;}
-#define RD_HIGH     {PORT_RD|=RD_BIT;}
-#define RD_LOW      {PORT_RD&=~RD_BIT;}
+#define RD_HIGH	 {PORT_RD|=RD_BIT;}
+#define RD_LOW	  {PORT_RD&=~RD_BIT;}
 #define RD_RISING   {PORT_RD|=RD_BIT;PORT_RD&=~RD_BIT;}
 
 #define RS_RD_HIGH	{DDR_RD|=RD_BIT|RS_BIT;}
@@ -115,9 +115,9 @@ This is heavily based on seeed's library but is ported to avr-gcc
 
 #endif
 #define LEFT2RIGHT 0
-#define DOWN2UP    1
+#define DOWN2UP	1
 #define RIGHT2LEFT 2
-#define UP2DOWN    3
+#define UP2DOWN	3
 extern unsigned char simpleFont[][8];
 
 void tft_pushData(unsigned char data);
@@ -126,7 +126,7 @@ unsigned char tft_getData(void);
 void tft_sendData(unsigned int data);
 void tft_setXY(unsigned int poX, unsigned int poY);
 void tft_setDisplayDirect(unsigned char Direction);
-void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,unsigned int color);
+void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,uint16_t color);
 void tft_fillRectangle(unsigned int poX, unsigned int poY, unsigned int length, unsigned int width, unsigned int color);
 void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);
 void tft_drawHorizontalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);

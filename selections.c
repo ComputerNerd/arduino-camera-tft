@@ -7,8 +7,7 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 #ifndef MT9D11
-void setmatrix(uint8_t id)
-{
+void setmatrix(uint8_t id){
 	switch (id) {
 		case 0:
 			#ifdef ov7670
@@ -95,15 +94,14 @@ const char wb5[] PROGMEM="Office";
 const char wb6[] PROGMEM="Home";
 const char *const wb_table[] PROGMEM={wb0,wb1,wb2,wb3,wb4,wb5,wb6};
 #ifdef MT9D111
-const char res0[] PROGMEM="UXVGA";
-const char res1[] PROGMEM="SVGA";
+const char res0[] PROGMEM="SVGA";
+const char res1[] PROGMEM="QVGA";
 #else
 const char res0[] PROGMEM="VGA";
 const char res1[] PROGMEM="QVGA";
 #endif
 const char *const res_tab[] PROGMEM={res0,res1};
-uint8_t selection(const char ** table,uint8_t maxitems)
-{
+uint8_t selection(const char ** table,uint8_t maxitems){
 	uint8_t item;
 	uint16_t x,y,z;
 	z=31<<8;
@@ -148,22 +146,20 @@ const char config0[] PROGMEM = "Linux driver";
 const char config1[] PROGMEM = "suwa-koubou";
 const char config2[] PROGMEM = "Arducam";
 const char *const config_tab[] PROGMEM = {config0,config1,config2};
-void configSel(void)
-{
+void configSel(void){
 	initCam(selection((const char**)config_tab,3));
 }
 #endif
-void menu(void)
-{
+void menu(void){
 	uint16_t x,y,z;
 	while (1){
-		switch (selection((const char**)menu_table,9)) {
+		switch (selection((const char**)menu_table,9)){
 			case 0:
+			setColor(rgb565);
+			setRes(qvga);
 			#ifdef MT9D111
 				editRegs(0);
 			#else
-				setColor(rgb565);
-				setRes(qvga);
 				editRegs();
 			#endif
 		break;
@@ -292,22 +288,16 @@ void menu(void)
 				#ifdef MT9D111
 					wrReg16(0xF0,2);//page 2
 					wrReg16(0x0D,0);
+					setColor(yuv422);
+					//verifySR8_16P(MT9D111_init);
 				#endif
 				if(reso){
-					#ifdef MT9D111
-						wrSensorRegs8_16(default_size_a_list);
-					#else
-					setRes(qvga);
-					#endif
 					#ifndef MT9D111
+						setRes(qvga);
 						setColor(yuv422);
 					#endif
 					
 				}else{
-					//setRes(vga);
-					#ifdef MT9D111
-						wrSensorRegs8_16(default_size_b_list);
-					#endif
 					#ifdef ov7670
 						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
 					#endif

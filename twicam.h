@@ -17,6 +17,7 @@ struct regval_listP {
 	uint8_t reg_num;
 	uint16_t value;
 };
+void verifySR8_16P(const struct regval_listP reglist[]);
 #else
 struct regval_list {
 	uint8_t reg_num;

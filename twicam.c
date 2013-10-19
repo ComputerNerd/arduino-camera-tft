@@ -7,45 +7,40 @@
 #include "camregdef.h"
 #include "ov7670_regs.h"
 #include "MT9D111_regs.h"
-void errorD(uint8_t err)
-{
+void errorD(uint8_t err){
 	if (err !=0){
 		uint16_t x=WHITE;
 		while (1)
 			tft_drawStringP(PSTR("TWI ERROR!"),120,300,3,x--);
 	}
 }
-void twiStart(void)
-{
+void twiStart(void){
 	TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);//send start
 	while (!(TWCR & (1<<TWINT))) {}//wait for start to be transmitted
 	if ((TWSR & 0xF8) != TW_START)
 		errorD(1);
 }
-void twiWriteByte(uint8_t DATA,uint8_t type)
-{
+void twiWriteByte(uint8_t DATA,uint8_t type){
 	static uint16_t err=5;
 	TWDR = DATA;
 	TWCR = _BV(TWINT) | _BV(TWEN);
 	while (!(TWCR & (1<<TWINT))) {}
 	if ((TWSR & 0xF8) != type)
 		errorD(err);
-	err++;
+	++err;
 }
-void twiAddr(uint8_t addr,uint8_t typeTWI)
-{
+void twiAddr(uint8_t addr,uint8_t typeTWI){
 	//This function does not do error checking
 	TWDR = addr;//send address
-	TWCR = _BV(TWINT) | _BV(TWEN); /* clear interrupt to start transmission */
-	while ((TWCR & _BV(TWINT)) == 0) ; /* wait for transmission */
+	TWCR = _BV(TWINT) | _BV(TWEN);		/* clear interrupt to start transmission */
+	while ((TWCR & _BV(TWINT)) == 0);	/* wait for transmission */
 	if ((TWSR & 0xF8) != typeTWI)
 		errorD(2);
 }
-uint8_t twiRd(uint8_t nack)
-{
+uint8_t twiRd(uint8_t nack){
 	if (nack){
 		TWCR=_BV(TWINT) | _BV(TWEN);
-		while ((TWCR & _BV(TWINT)) == 0); /* wait for transmission */
+		while ((TWCR & _BV(TWINT)) == 0);	/* wait for transmission */
 	if ((TWSR & 0xF8) != TW_MR_DATA_NACK)
 		errorD(4);
 		return TWDR;
@@ -57,8 +52,7 @@ uint8_t twiRd(uint8_t nack)
 		return TWDR;
 	}
 }
-void wrReg(uint8_t reg,uint8_t dat)
-{
+void wrReg(uint8_t reg,uint8_t dat){
 	//send start condition
 	PORTG|=1<<5;
 	twiStart();
@@ -69,8 +63,7 @@ void wrReg(uint8_t reg,uint8_t dat)
 	_delay_ms(1);
 	PORTG&=~(1<<5);
 }
-uint8_t rdReg(uint8_t reg)
-{
+uint8_t rdReg(uint8_t reg){
 	PORTG|=1<<5;
 	uint16_t dat;
 	twiStart();
@@ -87,8 +80,7 @@ uint8_t rdReg(uint8_t reg)
 	return dat;
 }
 #ifdef MT9D111
-void wrReg16(uint8_t reg,uint16_t dat)
-{
+void wrReg16(uint8_t reg,uint16_t dat){
 	//send start condition
 	PORTG|=1<<5;
 	twiStart();
@@ -100,8 +92,7 @@ void wrReg16(uint8_t reg,uint16_t dat)
 	_delay_ms(1);
 	PORTG&=~(1<<5);
 }
-uint16_t rdReg16(uint8_t reg)
-{
+uint16_t rdReg16(uint8_t reg){
 	PORTG|=1<<5;
 	uint16_t dat;
 	twiStart();
@@ -118,8 +109,7 @@ uint16_t rdReg16(uint8_t reg)
 	PORTG&=~(1<<5);
 	return dat;
 }
-void wrSensorRegs8_16(const struct regval_list reglist[])
-{
+void wrSensorRegs8_16(const struct regval_list reglist[]){
 	uint8_t reg_addr;
 	uint16_t reg_val;
 	const struct regval_list *next = reglist;
@@ -130,8 +120,7 @@ void wrSensorRegs8_16(const struct regval_list reglist[])
 	   	next++;
 	}
 }
-void wrSensorRegs8_16P(const struct regval_listP reglist[])
-{
+void wrSensorRegs8_16P(const struct regval_listP reglist[]){
 	uint8_t reg_addr;
 	uint16_t reg_val;
 	uint8_t page;
@@ -153,44 +142,108 @@ void wrSensorRegs8_16P(const struct regval_listP reglist[])
 	   	++next;
 	}
 }
+void verifySR8_16P(const struct regval_listP reglist[]){
+	uint8_t reg_addr;
+	uint16_t reg_val;
+	uint8_t page;
+	uint16_t row=0;
+	tft_paintScreenBlack();
+	const struct regval_listP *next = reglist;
+	while ((reg_addr != 0xFF) | (reg_val != 0xFFFF)){
+		page=pgm_read_byte(&next->page);
+		reg_addr = pgm_read_byte(&next->reg_num);
+		reg_val = pgm_read_word(&next->value);
+		if(page==MT9D111_DELAY){
+			uint16_t l;
+			for(l=0;l<reg_val;++l)
+				_delay_ms(1);
+		}else if(page==EndRegs_MT9D111)
+			break;
+		else{
+			wrReg16(0xF0,page);
+			if((reg_addr==0xC6)&&(page==1))
+				wrReg16(reg_addr, reg_val);
+			else{
+				if(rdReg16(reg_addr)!=reg_val){
+					char temp[96];
+					sprintf(temp,"Error P: %x A: %x V: %x",page,reg_addr,reg_val);
+					tft_drawString(&temp[0],row,320,1,WHITE);
+					row+=8;
+					wrReg16(reg_addr, reg_val);
+					_delay_ms(100);
+					if(row>230){
+						row=0;
+						tft_paintScreenBlack();
+					}
+				}
+			}
+			
+		}
+	   	++next;
+	}
+	_delay_ms(2000);
+}
 #endif
-#ifndef MT9D111
-void setColor(uint8_t color)
-{
+void setColor(uint8_t color){
 	switch(color){
 		case yuv422:
-			wrSensorRegs8_8(yuv422_ov7670);
+			#ifdef MT9D111
+				wrReg16(0xC6,(1<<13)|(7<<8)|125);
+				wrReg16(0xC8,0);
+			#else
+				wrSensorRegs8_8(yuv422_ov7670);
+			#endif
 		break;
 		case rgb565:
-			wrSensorRegs8_8(rgb565_ov7670);
-			{uint8_t temp=rdReg(0x11);
-			_delay_ms(1);
-			wrReg(0x11,temp);}//accorind to the linux kernel driver rgb565 PCLK needs re-writting
+			#ifdef MT9D111
+				wrReg16(0xC6,(1<<13)|(7<<8)|125);
+				wrReg16(0xC8,(1<<5));
+			#else
+				wrSensorRegs8_8(rgb565_ov7670);
+				{uint8_t temp=rdReg(0x11);
+				_delay_ms(1);
+				wrReg(0x11,temp);}//accorind to the linux kernel driver rgb565 PCLK needs re-writting
+			#endif
 		break;
+		#ifndef MT9D111
 		case bayerRGB:
 			wrSensorRegs8_8(bayerRGB_ov7670);
 		break;
+		#endif
 	}
+	#ifdef MT9D111
+	wrReg16(0xC6,0xA103);
+	wrReg16(0xC8,5);//refresh
+	#endif
 }
-#endif
 #ifdef ov7740
-void scalingToggle(uint8_t use)
-{
+void scalingToggle(uint8_t use){
 	if(use)
 		wrReg(ISP_CTRL02,rdReg(ISP_CTRL02)|(1<<4)|(1<<5));
 	else
 		wrReg(ISP_CTRL02,rdReg(ISP_CTRL02)&(~((1<<4)|(1<<5))));
 }
 #endif
-void setRes(uint8_t res)
-{
+#ifdef MT9D111
+void setMT9D111res(uint16_t w,uint16_t h){
+	wrReg16(0xF0,1);
+	wrReg16(0xC6,(1<<13)|(7<<8)|3);
+	wrReg16(0xC8,w);
+	wrReg16(0xC6,(1<<13)|(7<<8)|5);
+	wrReg16(0xC8,h);
+	wrReg16(0xC6,0xA103);
+	wrReg16(0xC8,5);//refresh
+}
+#endif
+void setRes(uint8_t res){
 	switch(res){
 		case vga:
 			//wrReg(0x11,2);//divider
 			#ifdef ov7740
 				scalingToggle(0);
 			#elif defined MT9D111
-				wrSensorRegs8_16(MT9D111_VGA);
+				//wrSensorRegs8_16(MT9D111_VGA);
+				setMT9D111res(640,480);
 			#else
 				wrReg(REG_COM3,0);	// REG_COM3
 				wrSensorRegs8_8(vga_ov7670);
@@ -200,7 +253,8 @@ void setRes(uint8_t res)
 			#ifdef ov7740
 				scalingToggle(1);
 			#elif defined MT9D111
-				wrSensorRegs8_16(MT9D111_QVGA);
+				//wrSensorRegs8_16(MT9D111_QVGA);
+				setMT9D111res(320,240);
 			#else
 				wrReg(0x11,1);//divider
 				wrReg(REG_COM3,4);	// REG_COM3 enable scaling
@@ -220,8 +274,7 @@ void setRes(uint8_t res)
 		#endif
 	}
 }
-void wrSensorRegs8_8(const struct regval_list reglist[])
-{
+void wrSensorRegs8_8(const struct regval_list reglist[]){
 	uint8_t reg_addr,reg_val;
 	const struct regval_list *next = reglist;
 	while ((reg_addr != 0xff) | (reg_val != 0xff)){
@@ -238,22 +291,20 @@ void initCam(void)
 #endif
 {
 	#ifdef MT9D111
-		_delay_ms(1000);
-		wrSensorRegs8_16P(MT9D111_init);
+		//_delay_ms(1000);
+		//wrSensorRegs8_16P(MT9D111_init);
 		//_delay_ms(1000);
 		//wrSensorRegs8_16(MT9D111_QVGA);
 		//wrSensorRegs8_16(MT9D111_RGB565);
 		//wrSensorRegs8_16(default_size_a_list);
-		wrReg16(0xF0,1);//page 1
-		wrReg16(0xC6, 0xA103); //SEQ_CMD
-		wrReg16(0xC8, 0x0002); //SEQ_CMD, Do capture
-		//wrReg16(0xA4,(1<<5));//dithering
-		wrReg16(0xF0,2);//pagevv 2
-		wrReg16(0x0D,0);
-		wrReg16(0xF0,0);//page 0
-		//wrReg16(0x0A,4|(1<<4));//give each pixel N cyles or 2N cyles if 1 ADC 
-		wrSensorRegs8_16(default_size_a_list);
-		//wrSensorRegs8_16P(MT9D111_refresh);
+		wrReg16(0xF0,0);
+		wrReg16(0xF2,0);
+		wrReg16(0xF0,1);
+		wrReg16(0x97,(1<<5));//rgb565
+		wrReg16(0xC6,(1<<13)|(7<<8)|107);
+		wrReg16(0xC8,0);
+		//wrReg16(0xF0,2);//page 2
+		//wrReg16(0x0D,0);
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider

@@ -10,8 +10,7 @@
 #define TS_MAXX 900
 #define TS_MINY 120
 #define TS_MAXY 940
-inline uint16_t readADC(uint8_t mux)
-{
+inline uint16_t readADC(uint8_t mux){
 	ADMUX=mux|(1<<REFS0);
 	//_delay_ms(1);
 	ADCSRA|=(1<<ADSC);
@@ -21,8 +20,7 @@ inline uint16_t readADC(uint8_t mux)
 	//ADCSRA=0;//disabe ADC
 	return silly;
 }
-void getPoint(uint16_t * x,uint16_t * y,uint16_t * pressure)
-{
+void getPoint(uint16_t * x,uint16_t * y,uint16_t * pressure){
 waiting:
 	//YM A0 XM A1 YP A2 XP A3
 	DDRF&=~(1|(1<<2));//set YP and YM to input

@@ -15,8 +15,7 @@
 #define YUV2G(Y, U, V) CLIP(( 298 * C(Y) - 100 * D(U) - 208 * E(V) + 128) >> 8)
 #define YUV2B(Y, U, V) CLIP(( 298 * C(Y) + 516 * D(U)              + 128) >> 8)
 uint8_t buf[1280];
-void capImgqqvga(uint8_t offsetx)
-{
+void capImgqqvga(uint8_t offsetx){
 	cli();
 	uint8_t w,ww;
 	uint8_t h;
@@ -55,8 +54,7 @@ void capImgqqvga(uint8_t offsetx)
 	CS_HIGH;
 	sei();
 }
-void capImghq(void)
-{
+void capImghq(void){
 	cli();
 	uint16_t w,ww;
 	uint8_t h;
@@ -119,10 +117,9 @@ void capImghq(void)
 	CS_HIGH;
 	sei();
 }
-inline void serialWrB(uint8_t dat)
-{
+inline void serialWrB(uint8_t dat){
 	UDR0=dat;
-	while ( !( UCSR0A & (1<<UDRE0)) ) {} //wait for byte to transmit
+	while (!( UCSR0A & (1<<UDRE0))){} //wait for byte to transmit
 }
 #ifdef MT9D111
 void capImgOff(uint16_t off)
@@ -175,8 +172,7 @@ void capImgOff(uint8_t off)
 		}
 	}
 }
-void transBuffer(void)
-{
+void transBuffer(void){
 	uint16_t w;
 	uint8_t h;
 	for (h=0;h<240;++h){
@@ -188,19 +184,11 @@ void transBuffer(void)
 		}
 	}
 }
-void capImgPCqvga(void)
-{
+void capImgPCqvga(void){
 	cli();
 	serialWrB('R');
 	serialWrB('D');
 	serialWrB('Y');
-	#ifdef MT9D111
-		uint16_t o;
-		for(o=0;o<576;o+=96){
-			capImgOff(o);
-			transBuffer();
-		}
-	#else
 	uint16_t w,ww;
 	uint8_t h;
 	w=640;
@@ -230,18 +218,16 @@ void capImgPCqvga(void)
 
 	}
 	transBuffer();
-	#endif
 }
-void capImgPC(void)
-{//sends raw bayer data to serial
-	//this must be divided into two transfers due to lack of ram
+void capImgPC(void){//sends image data to serial
+	//this must be divided into multiple transfers due to lack of ram
 	cli();
 	serialWrB('R');
 	serialWrB('D');
 	serialWrB('Y');
 	#ifdef MT9D111
 		uint16_t o;
-		for(o=0;o<1152;o+=96){
+		for(o=0;o<576;o+=96){
 			capImgOff(o);
 			transBuffer();
 		}
@@ -274,8 +260,7 @@ uint32_t capJpeg(void){
 	sei();
 }
 #endif
-void capImg(void)
-{
+void capImg(void){
 	cli();
 	uint16_t w,ww;
 	uint8_t h;
