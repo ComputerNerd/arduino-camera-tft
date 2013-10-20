@@ -157,11 +157,14 @@ void menu(void){
 	while (1){
 		switch (selection((const char**)menu_table,9)){
 			case 0:
-			setColor(rgb565);
-			setRes(qvga);
 			#ifdef MT9D111
+				setRes(qvga);
+				setColor(rgb565);
+				MT9D111Refresh();
 				editRegs(0);
 			#else
+				setColor(rgb565);
+				setRes(qvga);
 				editRegs();
 			#endif
 		break;
@@ -208,6 +211,9 @@ void menu(void){
 			case 4:
 				setColor(rgb565);
 				setRes(qqvga);
+				#ifdef MT9D111
+					MT9D111Refresh();
+				#endif
 				do{
 					getPoint(&x,&y,&z);
 					tft_setOrientation(1);
@@ -271,14 +277,16 @@ void menu(void){
 					//verifySR8_16P(MT9D111_init);
 				#endif
 				if(reso){
-					#ifndef MT9D111
 						setRes(qvga);
+					#ifndef MT9D111
 						setColor(yuv422);
 					#endif
 					
 				}else{
 					#ifdef ov7670
 						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+					#elif defined MT9D111
+						setRes(svga);
 					#endif
 				}
 				#ifdef ov7670
@@ -287,6 +295,8 @@ void menu(void){
 						wrReg(0x11,1);
 					else
 						wrReg(0x11,2);
+				#elif defined MT9D111
+					MT9D111Refresh();
 				#endif
 				tft_setOrientation(1);
 				do{

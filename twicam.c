@@ -144,10 +144,15 @@ void wrSensorRegs8_16P(const struct regval_listP reglist[]){
 }
 #endif
 void setColor(uint8_t color){
+	#ifdef MT9D111
+		wrReg16(0xF0,1);
+	#endif
 	switch(color){
 		case yuv422:
 			#ifdef MT9D111
-				wrReg16(0xC6,(1<<13)|(7<<8)|125);
+				wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|125);
+				wrReg16(0xC8,0);
+				wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|126);
 				wrReg16(0xC8,0);
 			#else
 				wrSensorRegs8_8(yuv422_ov7670);
@@ -155,7 +160,9 @@ void setColor(uint8_t color){
 		break;
 		case rgb565:
 			#ifdef MT9D111
-				wrReg16(0xC6,(1<<13)|(7<<8)|125);
+				wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|125);
+				wrReg16(0xC8,(1<<5));
+				wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|126);
 				wrReg16(0xC8,(1<<5));
 			#else
 				wrSensorRegs8_8(rgb565_ov7670);
@@ -170,10 +177,6 @@ void setColor(uint8_t color){
 		break;
 		#endif
 	}
-	#ifdef MT9D111
-	wrReg16(0xC6,0xA103);
-	wrReg16(0xC8,5);//refresh
-	#endif
 }
 #ifdef ov7740
 void scalingToggle(uint8_t use){
@@ -184,18 +187,25 @@ void scalingToggle(uint8_t use){
 }
 #endif
 #ifdef MT9D111
+void MT9D111Refresh(void){
+	wrReg16(0xC6,0xA103);
+	wrReg16(0xC8,5);//refresh
+}
 void setMT9D111res(uint16_t w,uint16_t h){
 	wrReg16(0xF0,1);
 	wrReg16(0xC6,(1<<13)|(7<<8)|3);
 	wrReg16(0xC8,w);
 	wrReg16(0xC6,(1<<13)|(7<<8)|5);
 	wrReg16(0xC8,h);
-	wrReg16(0xC6,0xA103);
-	wrReg16(0xC8,5);//refresh
 }
 #endif
 void setRes(uint8_t res){
 	switch(res){
+		#ifdef MT9D111
+		case svga:
+			setMT9D111res(800,600);
+		break;
+		#endif
 		case vga:
 			//wrReg(0x11,2);//divider
 			#ifdef ov7740

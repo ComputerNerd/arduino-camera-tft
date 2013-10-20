@@ -6,7 +6,7 @@
 #define qvga 1
 #define qqvga 2
 #ifdef MT9D111
-#define SVGA 3
+#define svga 3
 #define XGA 4
 #define WXGA 5
 #define QuVGA 6
