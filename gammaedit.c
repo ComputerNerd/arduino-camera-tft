@@ -53,9 +53,7 @@ void redrawGraph(void){
 }
 void gammaEdit(void){
 	uint16_t x,y,z;
-	#ifndef MT9D111
-	setRes(qqvga);//FIXME: add support for MT9D111 QQVGA
-	#endif
+	setRes(qqvga);
 	tft_paintScreenBlack();
 	do{
 		getPoint(&x,&y,&z);

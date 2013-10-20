@@ -142,47 +142,6 @@ void wrSensorRegs8_16P(const struct regval_listP reglist[]){
 	   	++next;
 	}
 }
-void verifySR8_16P(const struct regval_listP reglist[]){
-	uint8_t reg_addr;
-	uint16_t reg_val;
-	uint8_t page;
-	uint16_t row=0;
-	tft_paintScreenBlack();
-	const struct regval_listP *next = reglist;
-	while ((reg_addr != 0xFF) | (reg_val != 0xFFFF)){
-		page=pgm_read_byte(&next->page);
-		reg_addr = pgm_read_byte(&next->reg_num);
-		reg_val = pgm_read_word(&next->value);
-		if(page==MT9D111_DELAY){
-			uint16_t l;
-			for(l=0;l<reg_val;++l)
-				_delay_ms(1);
-		}else if(page==EndRegs_MT9D111)
-			break;
-		else{
-			wrReg16(0xF0,page);
-			if((reg_addr==0xC6)&&(page==1))
-				wrReg16(reg_addr, reg_val);
-			else{
-				if(rdReg16(reg_addr)!=reg_val){
-					char temp[96];
-					sprintf(temp,"Error P: %x A: %x V: %x",page,reg_addr,reg_val);
-					tft_drawString(&temp[0],row,320,1,WHITE);
-					row+=8;
-					wrReg16(reg_addr, reg_val);
-					_delay_ms(100);
-					if(row>230){
-						row=0;
-						tft_paintScreenBlack();
-					}
-				}
-			}
-			
-		}
-	   	++next;
-	}
-	_delay_ms(2000);
-}
 #endif
 void setColor(uint8_t color){
 	switch(color){
@@ -261,17 +220,16 @@ void setRes(uint8_t res){
 				wrSensorRegs8_8(qvga_ov7670);
 			#endif
 		break;
-		#ifndef MT9D111
 		case qqvga:
 			#ifdef ov7740
 				scalingToggle(1);
+			#elif defined MT9D111
+				setMT9D111res(160,120);
 			#else
 				wrReg(0x11,0);//divider
 				wrReg(REG_COM3,4);	// REG_COM3 enable scaling
 				wrSensorRegs8_8(qqvga_ov7670);
 			#endif
-		break;
-		#endif
 	}
 }
 void wrSensorRegs8_8(const struct regval_list reglist[]){
@@ -303,6 +261,8 @@ void initCam(void)
 		wrReg16(0x97,(1<<5));//rgb565
 		wrReg16(0xC6,(1<<13)|(7<<8)|107);
 		wrReg16(0xC8,0);
+		wrReg16(0xC6,(1<<13)|(2<<8)|11);
+		wrReg16(0xC8,16384);
 		//wrReg16(0xF0,2);//page 2
 		//wrReg16(0x0D,0);
 	#elif defined ov7740

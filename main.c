@@ -15,7 +15,7 @@
 #include "gammaedit.h"
 #include "selections.h"
 void menu(void);
-uint16_t leadingZeros(uint8_t x);
+uint16_t leadingZeros(char * buf,uint8_t x);
 //OV7670 undocumented rgister 1F is called LAEC this means exposures less than one line
 void main(void){
 	ADCSRA=(1<<ADEN)|(1<<ADPS2);//enable ADC
@@ -55,6 +55,7 @@ void redrawT(uint8_t z,uint16_t regD,uint8_t micro,uint8_t id,uint8_t bitm8)
 void redrawT(uint8_t z,uint8_t regD)
 #endif
 {
+	char buf[16];
 	tft_fillRectangle(0,320,112,320,BLACK);
 	#ifdef MT9D111
 	if(micro)
@@ -62,29 +63,29 @@ void redrawT(uint8_t z,uint8_t regD)
 	else
 	#endif
 	tft_drawStringP(PSTR("Register:"),0,320,2,WHITE);
-	utoa(z,(char *)buf,16);
+	utoa(z,buf,16);
 	#ifdef MT9D111
 		if(micro)
 			tft_drawString((char *)buf,0,208,2,WHITE);
 		else
 	#endif
-	tft_drawString((char *)buf,0,176,2,WHITE);
-	utoa(regD,(char *)buf,16);
-	tft_drawString((char *)buf,16,320,2,WHITE);
-	utoa(regD,(char *)buf,10);
-	tft_drawString((char *)buf,32,320,2,WHITE);
+	tft_drawString(buf,0,176,2,WHITE);
+	utoa(regD,buf,16);
+	tft_drawString(buf,16,320,2,WHITE);
+	utoa(regD,buf,10);
+	tft_drawString(buf,32,320,2,WHITE);
 	#ifdef MT9D111
 		if(micro){
-			utoa(id,(char*)buf,16);
+			utoa(id,buf,16);
 			tft_drawChar(',',0,176,2,WHITE);
 		}
-		utoa(regD>>8,(char *)buf,2);
-		tft_drawString((char *)buf,48,leadingZeros(48),4,WHITE);
-		utoa(regD&255,(char *)buf,2);
-		tft_drawString((char *)buf,80,leadingZeros(80),4,WHITE);  
+		utoa(regD>>8,buf,2);
+		tft_drawString(buf,48,leadingZeros(buf,48),4,WHITE);
+		utoa(regD&255,buf,2);
+		tft_drawString(buf,80,leadingZeros(buf,80),4,WHITE);  
 	#else
-		utoa(regD,(char *)buf,2);
-		tft_drawString((char *)buf,80,leadingZeros(80),4,WHITE);
+		utoa(regD,buf,2);
+		tft_drawString(buf,80,leadingZeros(buf,80),4,WHITE);
 	#endif
 }
 #ifdef MT9D111
@@ -174,6 +175,7 @@ void editRegs(void)
 					uint8_t stp=0;
 				#endif
 				do {
+					char buf[8];
 					wrReg(address,stp);
 					_delay_ms(100);//give register time to settle
 					tft_setOrientation(1);
@@ -308,7 +310,7 @@ void editRegs(void)
 		}*/
 	}//end of loop
 }
-uint16_t leadingZeros(uint8_t x){
+uint16_t leadingZeros(char * buf,uint8_t x){
 	uint8_t len=strlen((const char *)buf);
 	uint16_t len2=320;
 	len=8-len;

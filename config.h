@@ -4,9 +4,8 @@
 //#define ov7740
 #define vga 0
 #define qvga 1
-#ifndef MT9D111
 #define qqvga 2
-#else
+#ifdef MT9D111
 #define SVGA 3
 #define XGA 4
 #define WXGA 5

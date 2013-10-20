@@ -4,6 +4,8 @@
 #include "camregdef.h"
 #include "config.h"
 #include "MT9D111_regs.h"
+#include "captureimage.h"
+#include "twicam.h"
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 #ifndef MT9D11
@@ -63,7 +65,7 @@ const char menu5[] PROGMEM = "gamma edit";
 #else
 const char menu5[] PROGMEM = "Fixme";
 #endif
-const char menu6[] PROGMEM = "hq capture";
+const char menu6[] PROGMEM = "ReplaceME";
 #ifdef ov7670
 const char menu7[] PROGMEM = "White balance";
 #else
@@ -204,10 +206,8 @@ void menu(void){
 		break;
 		#endif
 			case 4:
-				#ifdef ov7670
-					setColor(rgb565);
-					setRes(qqvga);
-				#endif
+				setColor(rgb565);
+				setRes(qqvga);
 				do{
 					getPoint(&x,&y,&z);
 					tft_setOrientation(1);
@@ -223,28 +223,7 @@ void menu(void){
 				gammaEdit();
 			break;
 			case 6:
-				//initCam(1);
-				setRes(vga);
-				#ifdef ov7670
-					wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
-					_delay_ms(200);
-					wrReg(0x11,14);
-				#elif defined ov7740
-					//FIXME add support for ov7740 bayer
-				#endif
-				do{
-					getPoint(&x,&y,&z);
-					tft_setOrientation(1);
-					capImghq();
-					tft_setDisplayDirect(DOWN2UP);
-				}while(z<10);
-				#ifdef ov7670
-					initCam(0);
-				#endif
-				setRes(qvga);
-				#ifndef MT9D111
-					setColor(rgb565);
-				#endif
+				//HQ capture sucked anyways so it is gone
 			break;
 			case 7:
 				#ifdef ov7670
