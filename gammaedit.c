@@ -5,6 +5,7 @@
 #include "camregdef.h"
 #include <stdint.h>
 #include <util/delay.h>
+#ifndef MT9D111
 static uint8_t point=0;
 inline void graph(uint8_t y,uint8_t x,uint16_t col){
 	y=y*15/32;
@@ -51,27 +52,36 @@ void redrawGraph(void){
 		graph(256-(rdReg(0xA8)*3/4),120,GREEN);
 	#endif
 }
+#endif
 void gammaEdit(void){
 	uint16_t x,y,z;
+	setColor(rgb565);
 	setRes(qqvga);
+	#ifdef MT9D111
+		MT9D111Refresh();
+	#endif
 	tft_paintScreenBlack();
-	do{
-		getPoint(&x,&y,&z);
-		tft_setOrientation(1);
-		#ifdef ov7670
-			wrReg(REG_COM13, COM13_UVSAT|COM13_RSVD);
-		#elif defined ov7740
-			wrReg(ISP_CTRL00,rdReg(ISP_CTRL00)&(~ISP_CTRL00_gamma));
-		#endif
-		capImgqqvga(160);
-		#ifdef ov7670
-			wrReg(REG_COM13, COM13_GAMMA|COM13_UVSAT|COM13_RSVD);
-		#elif defined ov7740
-			wrReg(ISP_CTRL00,rdReg(ISP_CTRL00)|ISP_CTRL00_gamma);
-		#endif
-		capImgqqvga(0);
-		tft_setDisplayDirect(DOWN2UP);
-		redrawGraph();
-	}while(z<10);
-	setRes(qvga);
+	#ifdef MT9D111
+		return;
+	#else
+		do{
+			getPoint(&x,&y,&z);
+			tft_setOrientation(1);
+			#ifdef ov7670
+				wrReg(REG_COM13, COM13_UVSAT|COM13_RSVD);
+			#elif defined ov7740
+				wrReg(ISP_CTRL00,rdReg(ISP_CTRL00)&(~ISP_CTRL00_gamma));
+			#endif
+			capImgqqvga(160);
+			#ifdef ov7670
+				wrReg(REG_COM13, COM13_GAMMA|COM13_UVSAT|COM13_RSVD);
+			#elif defined ov7740
+				wrReg(ISP_CTRL00,rdReg(ISP_CTRL00)|ISP_CTRL00_gamma);
+			#endif
+			capImgqqvga(0);
+			tft_setDisplayDirect(DOWN2UP);
+			redrawGraph();
+		}while(z<10);
+		setRes(qvga);
+	#endif
 }

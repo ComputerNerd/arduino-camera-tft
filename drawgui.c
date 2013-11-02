@@ -16,7 +16,7 @@ void redrawGUI(void)
 	tft_drawStringP(PSTR("reg"),156,320,2,WHITE);
 	tft_drawStringP(PSTR("+"),156,256,4,WHITE);
 	tft_drawStringP(PSTR("-"),156,224,4,WHITE);
-	tft_drawStringP(PSTR("Snap"),188,128,4,WHITE);
 	tft_drawStringP(PSTR("Exit"),188,320,3,WHITE);
 	tft_drawStringP(PSTR("Step"),188,232,3,WHITE);
+	tft_drawStringP(PSTR("Snap"),188,128,4,WHITE);
 }

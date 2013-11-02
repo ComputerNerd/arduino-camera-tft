@@ -268,13 +268,13 @@ void initCam(void)
 		wrReg16(0xF0,0);
 		wrReg16(0xF2,0);
 		wrReg16(0xF0,1);
-		wrReg16(0x97,(1<<5));//rgb565
 		wrReg16(0xC6,(1<<13)|(7<<8)|107);
 		wrReg16(0xC8,0);
 		wrReg16(0xC6,(1<<13)|(2<<8)|11);
 		wrReg16(0xC8,16384);
-		//wrReg16(0xF0,2);//page 2
-		//wrReg16(0x0D,0);
+		wrReg16(0xC6,(1<<13)|(7<<8)|25);//Row speed
+		wrReg16(0xC8,3);
+		MT9D111Refresh();
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider

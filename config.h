@@ -2,6 +2,7 @@
 #define MT9D111
 //#define ov7670
 //#define ov7740
+#define haveSDcard
 #define vga 0
 #define qvga 1
 #define qqvga 2

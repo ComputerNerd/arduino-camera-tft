@@ -6,8 +6,12 @@
 #include "MT9D111_regs.h"
 #include "captureimage.h"
 #include "twicam.h"
+#include "gammaedit.h"
 #include <avr/pgmspace.h>
 #include <util/delay.h>
+#include "mmc.h"
+#include "filebrowser.h"
+#include "exiticon.h"
 #ifndef MT9D11
 void setmatrix(uint8_t id){
 	switch (id) {
@@ -65,17 +69,24 @@ const char menu5[] PROGMEM = "gamma edit";
 #else
 const char menu5[] PROGMEM = "Fixme";
 #endif
-const char menu6[] PROGMEM = "ReplaceME";
+const char menu6[] PROGMEM = "File Browser";
 #ifdef ov7670
 const char menu7[] PROGMEM = "White balance";
 #else
 const char menu7[] PROGMEM = "FIXME!";
 #endif
 const char menu8[] PROGMEM = "Image to PC";
+const char menu9[] PROGMEM = "Next Page";
+
 const char *const menu_table[] PROGMEM = {
 	menu0,menu1,menu2,menu3,
 	menu4,menu5,menu6,menu7,
-	menu8
+	menu8,menu9
+};
+const char menup20[] PROGMEM = "Touch Test";
+const char menup21[] PROGMEM = "Previous Page";
+const char *const menu_tablep2[] PROGMEM = {
+	menup20,menup21
 };
 #ifdef ov7670
 const char maxtrix0[] PROGMEM = "Maxtrix yuv422";
@@ -96,23 +107,27 @@ const char wb5[] PROGMEM="Office";
 const char wb6[] PROGMEM="Home";
 const char *const wb_table[] PROGMEM={wb0,wb1,wb2,wb3,wb4,wb5,wb6};
 #ifdef MT9D111
-const char res0[] PROGMEM="SVGA";
-const char res1[] PROGMEM="QVGA";
+const char res0[] PROGMEM="UXGA jpeg";
+const char res1[] PROGMEM="SVGA";
+const char res2[] PROGMEM="QVGA";
+const char res3[] PROGMEM="Main Menu";
+const char *const res_tab[] PROGMEM={res0,res1,res2,res3};
 #else
 const char res0[] PROGMEM="VGA";
 const char res1[] PROGMEM="QVGA";
+const char res2[] PROGMEM="Main Menu";
+const char *const res_tab[] PROGMEM={res0,res1,res2};
 #endif
-const char *const res_tab[] PROGMEM={res0,res1};
 uint8_t selection(const char ** table,uint8_t maxitems){
 	uint8_t item;
 	uint16_t x,y,z;
-	z=31<<8;
 	tft_setOrientation(1);
 	tft_setXY(0,0);
 	CS_LOW;
     RS_HIGH;
     RD_HIGH;
     DDRA=0xFF;
+    z=31<<8;
 	for(item=0;item<240;++item){
 		for(x=0;x<320;++x){
 			WR_HIGH;
@@ -122,7 +137,7 @@ uint8_t selection(const char ** table,uint8_t maxitems){
 			PORTA=z>>8;
 			WR_LOW;
 		}
-		z-=31;
+		z-=33;
 	}
 	tft_setDisplayDirect(DOWN2UP);
 	item=0;
@@ -155,7 +170,7 @@ void configSel(void){
 void menu(void){
 	uint16_t x,y,z;
 	while (1){
-		switch (selection((const char**)menu_table,9)){
+		switch (selection((const char**)menu_table,10)){
 			case 0:
 			#ifdef MT9D111
 				setRes(qvga);
@@ -229,7 +244,9 @@ void menu(void){
 				gammaEdit();
 			break;
 			case 6:
-				//HQ capture sucked anyways so it is gone
+				//File browser
+				//start by listing files
+				browserSD();
 			break;
 			case 7:
 				#ifdef ov7670
@@ -269,25 +286,41 @@ void menu(void){
 				#ifdef ov7670
 				wrReg(0x1e,rdReg(0x1e)&(~(1<<5))&(~(1<<4)));
 				#endif
-				{uint8_t reso=selection((const char**)res_tab,2);
+				{
+				#ifdef MT9D111
+					uint8_t reso=selection((const char**)res_tab,4);
+				#else
+					uint8_t reso=selection((const char**)res_tab,3);
+				#endif
 				#ifdef MT9D111
 					wrReg16(0xF0,2);//page 2
 					wrReg16(0x0D,0);
 					setColor(yuv422);
-					//verifySR8_16P(MT9D111_init);
 				#endif
-				if(reso){
+				switch(reso){
+					case 0:
+						#ifdef ov7670
+							wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
+						#elif defined MT9D111
+							//setupt jpeg
+						#endif
+					break;
+					case 1:
+						#ifdef MT9D111
+							setRes(svga);
+						#else
+							setRes(qvga);
+							setColor(yuv422);
+						#endif
+					break;
+					#ifdef MT9D111
+					case 2:
 						setRes(qvga);
-					#ifndef MT9D111
-						setColor(yuv422);
+					break;
 					#endif
-					
-				}else{
-					#ifdef ov7670
-						wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
-					#elif defined MT9D111
-						setRes(svga);
-					#endif
+					default:
+						goto theEnd;
+					break;
 				}
 				#ifdef ov7670
 					_delay_ms(200);
@@ -300,13 +333,65 @@ void menu(void){
 				#endif
 				tft_setOrientation(1);
 				do{
-					if(reso)
-						capImgPCqvga();
-					else
-						capImgPC();
+					#ifdef MT9D111
+						switch(reso){
+							case 0:
+								capJpeg();
+							break;
+							case 1:
+								capImgPC();
+							break;
+							case 2:
+								capImgPCqvga();
+							break;
+						}
+					#else
+						if(reso)
+							capImgPCqvga();
+						else
+							capImgPC();
+					#endif
 					getPoint(&x,&y,&z);
 				}while(z<10);
-				tft_setDisplayDirect(DOWN2UP);}
+theEnd:
+				tft_setDisplayDirect(DOWN2UP);
+				}
+			break;
+			case 9:
+				switch(selection((const char**)menu_tablep2,2)){
+					case 0:
+						{
+							tft_drawImage_P(exit_icon,32,32,0,0);
+							uint16_t x1,y1;
+							do{
+								getPoint(&x,&y,&z);
+							}while(z<10);
+							if((y<=32)&&(x<=32))
+									break;
+							tft_fillCircle(x,y,4,WHITE);
+							while(1){
+								x1=x;
+								y1=y;
+								do{
+									getPoint(&x,&y,&z);
+								}while(z<10);
+								tft_fillRectangle(224,320,16,36,BLACK);
+								tft_fillCircle(x1,y1,4,BLACK);
+								tft_fillCircle(x,y,4,WHITE);
+								if((y<=32)&&(x<=32))
+									break;
+								char temp[6];
+								utoa(x,temp,10);
+								tft_drawString(temp,224,320,1,WHITE);
+								utoa(y,temp,10);
+								tft_drawString(temp,232,320,1,WHITE);
+							}
+						}
+					break;
+					case 1:
+						//previous page
+					break;
+				}
 			break;
 		}
 	}

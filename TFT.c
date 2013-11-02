@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <avr/pgmspace.h>
 #include <math.h>
+#include <stdlib.h>
 static uint8_t DisplayDirect;
 
 inline void tft_all_pin_input(void){
@@ -16,8 +17,7 @@ inline void tft_all_pin_input(void){
 	DDRB &=~ 0x03;
 #endif
 }
-inline void tft_all_pin_output(void)
-{
+inline void tft_all_pin_output(void){
 #ifdef MEGA
 	DDRA=0xff;
 #endif
@@ -26,8 +26,7 @@ inline void tft_all_pin_output(void)
 	DDRB |= 0x03;
 #endif
 }
-inline void tft_all_pin_low(void)
-{
+inline void tft_all_pin_low(void){
 #ifdef MEGA	
 	PORTA=0;
 #endif
@@ -36,10 +35,9 @@ inline void tft_all_pin_low(void)
 	PORTB &=~ 0x03;
 #endif
 }
-inline void tft_pushData(unsigned char data)
-{
-	tft_all_pin_low();
+inline void tft_pushData(unsigned char data){
 #ifdef SEEEDUINO
+	tft_all_pin_low();
 	PORTD |= (data<<2);
 	PORTB |= (data>>6);
 #endif
@@ -47,8 +45,7 @@ inline void tft_pushData(unsigned char data)
 	PORTA=data;
 #endif
 }
-inline void tft_sendCommand(unsigned int index)
-{
+inline void tft_sendCommand(uint8_t index){
 	#ifdef MEGA
 		DDRA=0xFF;
 		PORTA=0;
@@ -61,25 +58,84 @@ inline void tft_sendCommand(unsigned int index)
 	RD_HIGH;
 	WR_HIGH;
 	WR_LOW;
-	tft_pushData(0);
+	#ifndef MEGA
+		tft_pushData(0);//PORTA is already 0 for mega
+	#endif
 	WR_HIGH;
 	WR_LOW;
-	tft_pushData(index&0xff);
+	#ifdef MEGA
+		PORTA=index;
+	#else
+		tft_pushData(index);	
+	#endif
 	WR_HIGH;
 	CS_HIGH;
 }
-inline void tft_sendData(unsigned int data)
-{
+inline void tft_sendCommandf(uint8_t index){
+	#ifdef MEGA
+		DDRA=0xFF;
+		PORTA=0;
+	#else
+		tft_all_pin_output();
+		tft_all_pin_low();
+	#endif
+	//CS_LOW;
+	RS_LOW;
+	//RD_HIGH;
+	WR_HIGH;
+	WR_LOW;
+	#ifndef MEGA
+		tft_pushData(0);//PORTA is already 0 for mega
+	#endif
+	WR_HIGH;
+	WR_LOW;
+	#ifdef MEGA
+		PORTA=index;
+	#else
+		tft_pushData(index);	
+	#endif
+	WR_HIGH;
+	//CS_HIGH;
+}
+inline void tft_sendData(uint16_t data){
 	CS_LOW;
 	RS_HIGH;
 	RD_HIGH;
 	WR_LOW;
-	tft_pushData((data&0xff00)>>8);
+	#ifdef MEGA
+		PORTA=data>>8;
+	#else
+		tft_pushData(data>>8);
+	#endif
 	WR_HIGH;
 	WR_LOW;
-	tft_pushData(data&0xff);
+	#ifdef MEGA
+		PORTA=data&255;
+	#else
+		tft_pushData(data&255);
+	#endif
 	WR_HIGH;
 	CS_HIGH;
+}
+inline void tft_sendDataf(uint16_t data){
+	//CS_LOW;
+	RS_HIGH;
+	//RD_HIGH;
+	WR_LOW;
+	#ifdef MEGA
+		PORTA=data>>8;
+	#else
+		tft_pushData(data>>8);
+	#endif
+	WR_HIGH;
+	WR_LOW;
+	#ifdef MEGA
+		PORTA=data&255;
+	#else
+		tft_pushData(data&255);
+	#endif
+	WR_HIGH;
+	//CS_HIGH;
 }
 void tft_exitStandBy(void){
 	tft_sendCommand(0x0010);
@@ -140,12 +196,15 @@ unsigned int tft_readRegister(unsigned int index){
 	tft_all_pin_output();
 	return data;
 }
-void tft_setXY(unsigned int poX, unsigned int poY){
-	tft_sendCommand(0x0020);//X
-	tft_sendData(poX);
-	tft_sendCommand(0x0021);//Y
-	tft_sendData(poY);
+void tft_setXY(uint16_t poX, uint16_t poY){
+	CS_LOW;
+	RD_HIGH;
+	tft_sendCommandf(0x0020);//X
+	tft_sendDataf(poX);
+	tft_sendCommandf(0x0021);//Y
+	tft_sendDataf(poY);
 	tft_sendCommand(0x0022);//Start to write to display RAM
+	CS_HIGH;
 }
 void tft_setDisplayDirect(unsigned char Direction){
   DisplayDirect = Direction;
@@ -156,8 +215,11 @@ void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length
 	if(length+poY>MAX_Y)
 		length=MAX_Y-poY;
 	uint16_t i;
+	CS_LOW;
+	RD_HIGH;
 	for(i=0;i<length;++i)
-		tft_sendData(color);
+		tft_sendDataf(color);
+	CS_HIGH;
 }
 void tft_drawHorizontalLine(uint16_t poX, uint16_t poY,uint16_t length,uint16_t color){
 	tft_setXY(poX,poY);
@@ -204,11 +266,11 @@ void tft_drawLine(int16_t x0,int16_t y0,int16_t x1,int16_t y1,uint16_t color){
 	while (1){ /* loop */
 		tft_setPixel(x0,y0,color);
 		e2 = 2*err;
-		if (e2 >= dy) { /* e_xy+e_x > 0 */
+		if (e2 >= dy){ /* e_xy+e_x > 0 */
 			if (x0 == x1) break;
 			err += dy; x0 += sx;
 		}
-		if (e2 <= dx) { /* e_xy+e_y < 0 */
+		if (e2 <= dx){ /* e_xy+e_y < 0 */
 			if (y0 == y1) break;
 			err += dx; y0 += sy;
 		}
@@ -251,7 +313,7 @@ void tft_drawChar(unsigned char ascii,uint16_t poX, uint16_t poY,uint8_t size, u
 void tft_drawString(char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor){
 	while(*string){
 		tft_drawChar(*string, poX, poY, size, fgcolor);
-		string++;
+		++string;
 		if(DisplayDirect == LEFT2RIGHT){
 			if(poX < MAX_X)
 				poX+=8*size; // Move cursor right
@@ -293,12 +355,116 @@ void tft_drawStringP(const char *string,unsigned int poX, unsigned int poY,unsig
 		}
 	}
 }
+void tft_drawCircle(int poX, int poY, int r,uint16_t color){
+    int x = -r, y = 0, err = 2-2*r, e2; 
+    do {
+        tft_setPixel(poX-x, poY+y,color); 
+        tft_setPixel(poX+x, poY+y,color); 
+        tft_setPixel(poX+x, poY-y,color); 
+        tft_setPixel(poX-x, poY-y,color); 
+        e2 = err;
+        if (e2 <= y) { 
+            err += ++y*2+1;
+            if (-x == y && e2 <= x) e2 = 0; 
+        }
+        if (e2 > x) err += ++x*2+1; 
+    } while (x <= 0);
+}
+void tft_fillCircle(int poX, int poY, int r,uint16_t color){
+    int x = -r, y = 0, err = 2-2*r, e2;
+    do {
+
+        tft_drawVerticalLine(poX-x,poY-y,2*y,color);
+        tft_drawVerticalLine(poX+x,poY-y,2*y,color);
+
+        e2 = err;
+        if (e2 <= y) {
+            err += ++y*2+1;
+            if (-x == y && e2 <= x) e2 = 0;
+        }
+        if (e2 > x) err += ++x*2+1;
+    } while (x <= 0);
+
+}
 void tft_paintScreenBlack(void){
+	CS_LOW;
+	RD_HIGH;
 	uint16_t f;
 	for(f=0;f<38400;++f){
-		tft_sendData(BLACK);
-		tft_sendData(BLACK);
+		tft_sendDataf(BLACK);
+		tft_sendDataf(BLACK);
 	}
+	CS_HIGH;
+}
+void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
+	uint16_t a,b;
+	DDRA=0xFF;
+	tft_setOrientation(1);
+	for(b=y;b<h+y;++b){
+		tft_setXY(b,x);
+		CS_LOW;
+		RS_HIGH;
+		RD_HIGH;
+		dat+=(w-1)*2;
+		for(a=0;a<w;++a){
+			WR_LOW;
+			PORTA=pgm_read_byte(dat+1);
+			WR_HIGH;
+			WR_LOW;
+			PORTA=pgm_read_byte(dat);
+			WR_HIGH;
+			dat-=2;
+		}
+		dat+=(w+1)*2;
+	}
+	tft_setDisplayDirect(DOWN2UP);
+}
+void tft_drawImage(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
+	uint16_t a,b;
+	DDRA=0xFF;
+	tft_setOrientation(1);
+	for(b=y;b<h+y;++b){
+		tft_setXY(b,x);
+		CS_LOW;
+		RS_HIGH;
+		RD_HIGH;
+		dat+=(w-1)*2;
+		for(a=0;a<w;++a){
+			WR_LOW;
+			PORTA=dat[1];
+			WR_HIGH;
+			WR_LOW;
+			PORTA=*dat;
+			WR_HIGH;
+			dat-=2;
+		}
+		dat+=(w+1)*2;
+	}
+	tft_setDisplayDirect(DOWN2UP);
+}
+void tft_drawImageVf_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y){
+	uint16_t a;
+	int16_t b;
+	DDRA=0xFF;
+	tft_setOrientation(1);
+	for(b=y+h-1;b>=y;--b){
+		tft_setXY(b,x);
+		CS_LOW;
+		RS_HIGH;
+		RD_HIGH;
+		dat+=(w-1)*2;
+		for(a=0;a<w;++a){
+			WR_LOW;
+			PORTA=pgm_read_byte(dat+1);
+			WR_HIGH;
+			WR_LOW;
+			PORTA=pgm_read_byte(dat);
+			WR_HIGH;
+			dat-=2;
+		}
+		dat+=(w+1)*2;
+	}
+	tft_setDisplayDirect(DOWN2UP);
 }
 void tft_init(void){
 	CS_OUTPUT;
@@ -313,15 +479,15 @@ void tft_init(void){
 		tft_all_pin_low();
 	#endif
 	_delay_ms(100);
-
-	tft_sendCommand(0x0001);
-	tft_sendData(0x0100);
+	//register names and information from http://www.micro4you.com/files/lcd/SPFD5408A.pdf
+	tft_sendCommand(0x0001);//"Driver Output Control Register"
+	tft_sendData((1<<8));//This in effect makes the tft display backwards it changes shift direction
 	tft_sendCommand(0x0002);
-	tft_sendData(0x0700);
+	tft_sendData((1<<8)|(1<<9)|(1<<10));
 	tft_sendCommand(0x0003);
 	tft_sendData(0x1030);
-	tft_sendCommand(0x0004);
-	tft_sendData(0x0000);
+	tft_sendCommand(0x0004);//Scaling
+	tft_sendData(0x0000);//Disable
 	tft_sendCommand(0x0008);
 	tft_sendData(0x0302);
 	tft_sendCommand(0x000A);

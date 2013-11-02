@@ -4,12 +4,11 @@
 #include "TFT.h"
 void capImgqqvga(uint8_t offsetx){
 	cli();
-	uint8_t w,ww;
-	uint8_t h;
+	uint8_t w,ww,h;
 	uint8_t y=0;
 	w=160;
 	h=120;
-    DDRA=0xFF;
+	DDRA=0xFF;
     DDRC=0;
 	#ifdef MT9D111
 		while (PINE&32){}//wait for low
@@ -18,14 +17,14 @@ void capImgqqvga(uint8_t offsetx){
 		while (!(PINE&32)){}//wait for high
 		while (PINE&32){}//wait for low
 	#endif
-	while (h--){
+	do{
 		tft_setXY(y,offsetx);
 		++y;
 		CS_LOW;
 		RS_HIGH;
 		RD_HIGH;
 		ww=w;
-		while (ww--){
+		do{
 			WR_LOW;
 			while (PINE&16){}//wait for low
 			PORTA=PINC;
@@ -40,8 +39,8 @@ void capImgqqvga(uint8_t offsetx){
 			#ifndef ov7670
 				while (!(PINE&16)){}//wait for high
 			#endif
-		}
-	}
+		}while (--ww);
+	}while (--h);
 	CS_HIGH;
 	sei();
 }
