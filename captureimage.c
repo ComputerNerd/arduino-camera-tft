@@ -189,9 +189,9 @@ uint32_t capJpeg(void){
 #endif
 void capImg(void){
 	cli();
-	uint16_t w,ww;
+	uint8_t w,ww;
 	uint8_t h;
-	w=640;
+	w=160;
 	h=240;
 	tft_setXY(0,0);
 	CS_LOW;
@@ -209,6 +209,21 @@ void capImg(void){
 	while (h--){
 		ww=w;
 		while (ww--){
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
+			WR_LOW;
+			while (PINE&16){}//wait for low
+			PORTA=PINC;
+			WR_HIGH;
+			while (!(PINE&16)){}//wait for high
 			WR_LOW;
 			while (PINE&16){}//wait for low
 			PORTA=PINC;

@@ -7,8 +7,9 @@
 #include "unknownfile.h"
 #include "ff.h"
 #include "exiticon.h"
+#include "config.h"
 #include "tjpgd.h"
-void drawstrpart(char * str,uint8_t amount,uint16_t x,uint8_t y){
+static void drawstrpart(char * str,uint8_t amount,uint16_t x,uint8_t y){
 	uint8_t z;
 	for(z=0;z<amount;++z){
 		tft_drawChar(*str, y, x, 1, WHITE);
@@ -16,7 +17,7 @@ void drawstrpart(char * str,uint8_t amount,uint16_t x,uint8_t y){
 		x-=8;
 	}
 }
-void drawFile(char * fn,uint16_t x,uint8_t y){
+static void drawFile(char * fn,uint16_t x,uint8_t y){
 	uint8_t l=strlen(fn);
 	if(l>6){
 		drawstrpart(fn,6,x,y);
@@ -26,7 +27,17 @@ void drawFile(char * fn,uint16_t x,uint8_t y){
 	}
 	drawstrpart(fn,l,x,y);
 }
-static void put_rc (FRESULT rc,uint16_t x,uint16_t y){
+static void waitTouchUP(void){
+	uint16_t x,y,z;
+	do{
+		getPoint(&x,&y,&z);
+	}while(z>10);//Wait for release of touch screen
+	_delay_ms(250);
+	do{
+		getPoint(&x,&y,&z);
+	}while(z<10);
+}
+static void put_rc(FRESULT rc,uint16_t x,uint16_t y){
 	const char *p;
 	static const char str[] PROGMEM =
 		"OK\0" "DISK_ERR\0" "INT_ERR\0" "NOT_READY\0" "NO_FILE\0" "NO_PATH\0"
@@ -39,8 +50,9 @@ static void put_rc (FRESULT rc,uint16_t x,uint16_t y){
 		while(pgm_read_byte_near(p++));
 	}
 	tft_drawStringP(p,x,y,1,WHITE);
+	waitTouchUP();
 }
-uint8_t listFiles(DIR * Dir){
+static uint8_t listFiles(DIR * Dir){
 	//first draw the Down arrow
 	FRESULT res;
 	FILINFO fno;
@@ -54,18 +66,18 @@ uint8_t listFiles(DIR * Dir){
 		xx=320;
 		for(x=0;x<5;++x){
 			PORTG|=1<<5;//turn on led turn disk access
-			res = f_readdir(Dir, &fno);                   /* Read a directory item */
+			res = f_readdir(Dir, &fno);						 /* Read a directory item */
 			PORTG&=~(1<<5);
-            if (res != FR_OK || fno.fname[0] == 0) goto exitLoop;  /* Break on error or end of dir */
+				if (res != FR_OK || fno.fname[0] == 0) goto exitLoop;  /* Break on error or end of dir */
 			fn = fno.fname;
-			if(fno.fattrib & AM_DIR){                    /* It is a directory */
+			if(fno.fattrib & AM_DIR){						  /* It is a directory */
 				/*sprintf(&path[i], "/%s", fn);
 				res = scan_files(path);
 				if (res != FR_OK) break;
 				path[i] = 0;*/
 				tft_drawImage_P(folder_icon,32,25,xx-32,yy);
 				drawFile(fn,xx,yy+25);
-            }else{/* It is a file. */
+				}else{/* It is a file. */
 				//check extention
 				char * ext=strrchr(fn,'.');
 				++ext;
@@ -75,18 +87,19 @@ uint8_t listFiles(DIR * Dir){
 					tft_drawImage_P(unkownfile_icon,24,32,xx-24,yy);
 				drawFile(fn,xx,yy+32);
 				//printf("%s/%s\n", path, fn);
-            }
-            xx-=54;
+				}
+				xx-=54;
 		}
 		yy+=48;
 	}
 	tft_drawImage_P(arrow_icon,32,32,0,208);
 	return 1;
 exitLoop:
-	put_rc(res,yy,xx);
+	if(res!=FR_OK)
+		put_rc(res,yy,xx);
 	return 0;
 }
-uint8_t skipFiles(DIR * Dir,uint16_t amount){
+static uint8_t skipFiles(DIR * Dir,uint16_t amount){
 	if(amount==0)
 		return 0;
 	{
@@ -95,7 +108,7 @@ uint8_t skipFiles(DIR * Dir,uint16_t amount){
 		uint16_t x;
 		for(x=0;x<amount;++x){
 			PORTG|=1<<5;//turn on led turn disk access
-			res = f_readdir(Dir, &fno);                   /* Read a directory item */
+			res = f_readdir(Dir, &fno);						 /* Read a directory item */
 			PORTG&=~(1<<5);
 			if (res != FR_OK || fno.fname[0] == 0) return 1;  /* Break on error or end of dir */
 		}
@@ -103,75 +116,78 @@ uint8_t skipFiles(DIR * Dir,uint16_t amount){
 	return 0;
 }
 FIL File;
-/* User defined call-back function to input JPEG data */
-static UINT tjd_input (
-	JDEC* jd,		/* Decompression object */
-	BYTE* buff,		/* Pointer to the read buffer (NULL:skip) */
-	UINT nd			/* Number of bytes to read/skip from input stream */
+// User defined call-back function to input JPEG data
+UINT tjd_input (
+	JDEC* jd,		// Decompression object
+	BYTE* buff,		// Pointer to the read buffer (NULL:skip)
+	UINT nd			// Number of bytes to read/skip from input stream
 )
 {
 	WORD rb;
-	jd = jd;	/* Suppress warning (device identifier is not needed in this appication) */
-	if (buff) {	/* Read nd bytes from the input strem */
+	jd = jd;	// Suppress warning (device identifier is not needed in this appication)
+	if (buff){	// Read nd bytes from the input strem
 		PORTG|=1<<5;
 		f_read(&File,buff, nd, &rb);
 		PORTG&=~(1<<5);
-		return rb;	/* Returns number of bytes could be read */
+		return rb;	// Returns number of bytes could be read
 
-	} else {	/* Skip nd bytes on the input stream */
+	} else {	// Skip nd bytes on the input stream
 		return (f_lseek(&File,File.fptr + nd) == FR_OK) ? nd : 0;
 	}
 }
 
 
 
-/* User defined call-back function to output RGB bitmap */
-static UINT tjd_output (
-	JDEC* jd,		/* Decompression object of current session */
-	void* bitmap,	/* Bitmap data to be output */
-	JRECT* rect		/* Rectangular region to output */
+// User defined call-back function to output RGB bitmap
+UINT tjd_output (
+	JDEC* jd,		// Decompression object of current session
+	void* bitmap,	// Bitmap data to be output
+	JRECT* rect		// Rectangular region to output
 )
 {
-	jd = jd;	/* Suppress warning (device identifier is not needed in this appication) */
+	jd = jd;	// Suppress warning (device identifier is not needed in this appication)
 
-	/* Check user interrupt at left end */
-	//if (!rect->left && uart_test()) return 0;	/* Abort to decompression */
+	// Check user interrupt at left end
+	//if (!rect->left && uart_test()) return 0;	// Abort to decompression
 
-	/* Put the rectangular into the display device */
+	// Put the rectangular into the display device
 	//disp_blt(rect->left, rect->right, rect->top, rect->bottom, (uint16_t*)bitmap);
 	tft_drawImage(bitmap,rect->right-rect->left+1,rect->bottom-rect->top+1,320-rect->left,rect->top);
-	return 1;	/* Continue to decompression */
+	return 1;	// Continue to decompression
 }
-void waitTouchUP(void){
-	uint16_t x,y,z;
-	do{
-		getPoint(&x,&y,&z);
-	}while(z<10);
-	do{
-		getPoint(&x,&y,&z);
-	}while(z>10);//Wait for release of touch screen
+static inline void getfp(char * path,char * fn,char * fp){
+	fp[0]=0;
+	strcpy(fp,path);
+	strcat(fp,"/");
+	strcat(fp,fn);
 }
-void loadJpeg(char * path,char * fn){
+static void loadBmp(char * path,char * fn){
+	char fp[256];
+	getfp(path,fn,fp);
+}
+static void loadJpeg(char * path,char * fn){
 	JDEC jd;
 	JRESULT rc;
+	FRESULT res;
+	DDRA=0xFF;
 	char fp[256];
-	if(path[0]==0){
-		fp[0]='/';
-		fp[1]=0;
-	}else
-		fp[0]=0;
-	strcat(fp,path);
-	strcat(fp,fn);
-	f_open(&File,fp,FA_READ);
-	uint8_t work[3092];
-	rc=jd_prepare(&jd, tjd_input, work, 3092, 0);
+	getfp(path,fn,fp);
+	res=f_open(&File,fp,FA_READ);
+	if(res!=FR_OK){
+		put_rc(res,64,320);
+		f_close(&File);
+		return;
+	}
+	uint8_t work[3100];
+	rc=jd_prepare(&jd, tjd_input, work, 3100, 0);
 	if (rc != JDR_OK){
 		char buf[16];
 		itoa(rc,buf,10);
-		tft_drawStringP(PSTR("Error:"),64,320,1,WHITE);
-		tft_drawString(buf,72,320,1,WHITE);
+		tft_drawStringP(PSTR("Error:"),48,320,1,WHITE);
+		tft_drawString(buf,56,320,1,WHITE);
 		waitTouchUP();
 		f_close(&File);
+		return;
 	}
 	uint8_t scale;
 	uint16_t x,y,z;
@@ -184,11 +200,9 @@ void loadJpeg(char * path,char * fn){
 	for (scale=0;scale<3;++scale){
 			if ((jd.width >> scale) <= 320 && (jd.height >> scale) <= 240) break;
 	}
-	jd_decomp(&jd, tjd_output, scale);	/* Start to decompress */
+	jd_decomp(&jd, tjd_output, scale);	// Start to decompress*/
 	f_close(&File);
-	do{
-		getPoint(&x,&y,&z);
-	}while(z<10);
+	waitTouchUP();
 }
 void browserSD(void){
 	FRESULT res;
@@ -268,7 +282,7 @@ void browserSD(void){
 						res = f_readdir(&Dir, &fno);
 						PORTG&=~(1<<5);
 						char * fn=fno.fname;
-						if(fno.fattrib & AM_DIR){                    /* It is a directory */
+						if(fno.fattrib & AM_DIR){						  /* It is a directory */
 							//go in folder
 							f_closedir(&Dir);
 							strcat(currentDir,"/");

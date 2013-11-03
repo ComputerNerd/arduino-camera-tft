@@ -59,7 +59,7 @@ uint32_t get_fattime(void){
 #endif
 void main(void){
 	DDRL|=8;
-	ASSR &= ~(_BV(EXCLK) | _BV(AS2));
+	ASSR &= (uint8_t)~(_BV(EXCLK) | _BV(AS2));
 	//generate 8mhz clock
 	TCCR5A=67;
 	TCCR5B=17;
@@ -88,7 +88,7 @@ void main(void){
 	#endif
 	disk_timerproc();
 	sei();
-	TWSR&=~3;//disable prescaler for TWI
+	TWSR&=(uint8_t)~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
 	tft_drawStringP(PSTR("setup 2"),8,320,1,WHITE);
 	#ifdef ov7670

@@ -268,12 +268,22 @@ void initCam(void)
 		wrReg16(0xF0,0);
 		wrReg16(0xF2,0);
 		wrReg16(0xF0,1);
-		wrReg16(0xC6,(1<<13)|(7<<8)|107);
+		wrReg16(0xC6,(1<<13)|(7<<8)|107);//Fifo context A
 		wrReg16(0xC8,0);
-		wrReg16(0xC6,(1<<13)|(2<<8)|11);
-		wrReg16(0xC8,16384);
-		wrReg16(0xC6,(1<<13)|(7<<8)|25);//Row speed
-		wrReg16(0xC8,3);
+		/*wrReg16(0xC6,(1<<13)|(7<<8)|25);//Row speed
+		wrReg16(0xC8,3);*/
+		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|14);//increase maximum intergration time
+		wrReg16(0xc8,128);
+		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|16);//increase maximum virtual gain
+		wrReg16(0xc8,232);
+		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|24);//increase maximum gain
+		wrReg16(0xc8,224);
+		wrReg16(0xC6,(1<<13)|(2<<8)|20);//increase maximum pre-lc digital gain
+		wrReg16(0xc8,256);
+		wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|67);//gamma contex A
+		wrReg16(0xC8,2);
+		wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|68);//gamma B
+		wrReg16(0xC8,2);
 		MT9D111Refresh();
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode

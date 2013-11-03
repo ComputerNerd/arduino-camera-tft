@@ -140,9 +140,10 @@ inline void tft_sendDataf(uint16_t data){
 void tft_exitStandBy(void){
 	tft_sendCommand(0x0010);
 	tft_sendData(0x14E0);
+	//tft_sendData(0x1480);
 	_delay_ms(100);
 	tft_sendCommand(0x0007);
-	tft_sendData(0x0133);
+	tft_sendData(0x133);
 }
 void tft_setOrientation(uint8_t HV){//horizontal or vertical
 	tft_sendCommand(0x03);
@@ -253,7 +254,7 @@ void tft_drawHorizontalLine(uint16_t poX, uint16_t poY,uint16_t length,uint16_t 
 		CS_HIGH;
 	#endif
 }
-inline void tft_setPixel(unsigned int poX, unsigned int poY,unsigned int color){
+static inline void tft_setPixel(uint16_t poX, uint16_t poY,uint16_t color){
 	tft_setXY(poX,poY);
 	tft_sendData(color);
 }
@@ -571,4 +572,8 @@ void tft_init(void){
 
 	//paint screen black
 	tft_paintScreenBlack();
+	//try disabling backlight
+	uint16_t powerOld=tft_readRegister(0x10);
+	powerOld&=~(1<<7);
+	
 }

@@ -84,9 +84,10 @@ const char *const menu_table[] PROGMEM = {
 	menu8,menu9
 };
 const char menup20[] PROGMEM = "Touch Test";
-const char menup21[] PROGMEM = "Previous Page";
+const char menup21[] PROGMEM = "Time Lapse";
+const char menup22[] PROGMEM = "Previous Page";
 const char *const menu_tablep2[] PROGMEM = {
-	menup20,menup21
+	menup20,menup21,menup22
 };
 #ifdef ov7670
 const char maxtrix0[] PROGMEM = "Maxtrix yuv422";
@@ -358,7 +359,7 @@ theEnd:
 				}
 			break;
 			case 9:
-				switch(selection((const char**)menu_tablep2,2)){
+				switch(selection((const char**)menu_tablep2,3)){
 					case 0:
 						{
 							tft_drawImage_P(exit_icon,32,32,0,0);
@@ -389,6 +390,41 @@ theEnd:
 						}
 					break;
 					case 1:
+						//time lapse
+						setRes(qvga);
+						setColor(yuv422);
+						#ifdef MT9D111
+							MT9D111Refresh();
+						#endif
+						{
+							char buf[24];
+							uint16_t imgc=0;
+							tft_setOrientation(1);
+							do{
+								FIL Fo;
+								capImg();
+								utoa(imgc,buf,10);
+								strcat(buf,".RAW");
+								f_open(&Fo,buf,FA_WRITE|FA_CREATE_ALWAYS);
+								++imgc;
+								uint16_t cpybuf[320];
+								uint16_t w;
+								uint8_t h;
+								uint16_t written;
+								for (h=0;h<240;++h){
+									for (w=0;w<320;++w){
+										tft_setXY(h,w);
+										cpybuf[w]=tft_readRegister(0x22);
+									}
+									f_write(&Fo,cpybuf,640,&written);
+								}
+								f_close(&Fo);
+								getPoint(&x,&y,&z);
+							}while(z<10);
+							tft_setDisplayDirect(DOWN2UP);
+						}
+					break;
+					case 2:
 						//previous page
 					break;
 				}
