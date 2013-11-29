@@ -243,7 +243,7 @@ void browserSD(void){
 					}
 				}else if((x>=104)&&(x<=136)){
 					//see if the file browser should be closed or if the folder should be exited
-					if(currentDir[1]!=0){
+					if(currentDir[0]!=0){
 						f_closedir(&Dir);
 						char * c=strrchr(currentDir,'/');
 						memset(c,0,strlen(c));

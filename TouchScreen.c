@@ -74,10 +74,10 @@ waiting:
 	rtouch/=(float)z1;
 	rtouch-=1.0f;
 	rtouch*=(float)*x;
-	rtouch*=(float)300.0f;
+	rtouch*=(float)75.0f;//gcf of 300 and 1024 is 4 so 75 and 256
 	//rtouch>>=10;//divide by 1024
 	//rtouch>>=6;//convert to integer
-	rtouch/=1024.0f;
+	rtouch/=256.0f;
 	//_rxplate=300
 	*pressure=rtouch;
 	*x-=TS_MINX;//this simple range scaling formula is x*desiredmax/originalmax unlike many others it avoids floats

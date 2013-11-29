@@ -274,10 +274,10 @@ void initCam(void)
 		wrReg16(0xC8,3);*/
 		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|14);//increase maximum intergration time
 		wrReg16(0xc8,128);
-		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|16);//increase maximum virtual gain
+		/*wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|16);//increase maximum virtual gain
 		wrReg16(0xc8,232);
 		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|24);//increase maximum gain
-		wrReg16(0xc8,224);
+		wrReg16(0xc8,224);*/
 		wrReg16(0xC6,(1<<13)|(2<<8)|20);//increase maximum pre-lc digital gain
 		wrReg16(0xc8,256);
 		wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|67);//gamma contex A
