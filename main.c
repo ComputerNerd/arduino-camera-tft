@@ -63,6 +63,7 @@ void main(void){
 	//generate 8mhz clock
 	TCCR5A=67;
 	TCCR5B=17;
+	DDRC=0;//set ov7670 pins to input
 	#ifdef MT9D111
 	OCR5A=2;//Forumla for output clock is F_CPU/(2(x+1))
 	#else

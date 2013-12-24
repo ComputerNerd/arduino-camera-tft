@@ -198,7 +198,7 @@ void capImg(void){
 	RS_HIGH;
 	RD_HIGH;
 	DDRA=0xFF;
-	DDRC=0;
+	//DDRC=0;
 	#ifdef MT9D111
 		while (PINE&32){}//wait for low
 		while (!(PINE&32)){}//wait for high
