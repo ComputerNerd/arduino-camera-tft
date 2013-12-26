@@ -7,15 +7,15 @@
 #include <util/delay.h>
 #ifndef MT9D111
 static uint8_t point=0;
-inline void graph(uint8_t y,uint8_t x,uint16_t col){
+static inline void graph(uint8_t y,uint8_t x,uint16_t col){
 	y=y*15/32;
 	tft_setXY(239-y,319-x);
 	tft_sendData(col);
 }
-inline uint16_t pickSel(uint8_t sel){
+static inline uint16_t pickSel(uint8_t sel){
 		return sel==point ? RED:WHITE;
 }
-void redrawGraph(void){
+static void redrawGraph(void){
 	#ifdef ov7670
 		graph(rdReg(0x7b),2,pickSel(0));
 		graph(rdReg(0x7c),4,pickSel(1));

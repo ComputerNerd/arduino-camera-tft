@@ -44,7 +44,7 @@ void capImgqqvga(uint8_t offsetx){
 	CS_HIGH;
 	sei();
 }
-inline void serialWrB(uint8_t dat){
+static inline void serialWrB(uint8_t dat){
 	UDR0=dat;
 	while (!( UCSR0A & (1<<UDRE0))){} //wait for byte to transmit
 }
@@ -99,7 +99,7 @@ void capImgOff(uint8_t off)
 		}
 	}
 }
-void transBuffer(void){
+static void transBuffer(void){
 	uint16_t w;
 	uint8_t h;
 	for (h=0;h<240;++h){

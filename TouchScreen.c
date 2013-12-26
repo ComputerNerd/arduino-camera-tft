@@ -10,7 +10,7 @@
 #define TS_MAXX 900
 #define TS_MINY 120
 #define TS_MAXY 940
-inline uint16_t readADC(uint8_t mux){
+static inline uint16_t readADC(uint8_t mux){
 	ADMUX=mux|(1<<REFS0);
 	//_delay_ms(1);
 	ADCSRA|=(1<<ADSC);

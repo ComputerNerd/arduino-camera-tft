@@ -16,7 +16,7 @@
 #include "selections.h"
 #include "mmc.h"
 void menu(void);
-uint16_t leadingZeros(char * buf,uint8_t x);
+static uint16_t leadingZeros(char * buf,uint8_t x);
 //OV7670 undocumented rgister 1F is called LAEC this means exposures less than one line
 #ifdef haveSDcard
 #include "ff.h"		/* Declarations of FatFs API */
@@ -110,9 +110,9 @@ void main(void){
 	menu();
 }
 #ifdef MT9D111
-void redrawT(uint8_t z,uint16_t regD,uint8_t micro,uint8_t id,uint8_t bitm8)
+static void redrawT(uint8_t z,uint16_t regD,uint8_t micro,uint8_t id,uint8_t bitm8)
 #else
-void redrawT(uint8_t z,uint8_t regD)
+static void redrawT(uint8_t z,uint8_t regD)
 #endif
 {
 	char buf[16];
@@ -150,7 +150,7 @@ void redrawT(uint8_t z,uint8_t regD)
 	#endif
 }
 #ifdef MT9D111
-uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8){
+static uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8){
 	if(microEdit){
 		wrReg16(0xC6,address|(1<<13)|(maddr<<8)|(bitm8<<15));
 		return rdReg16(0xC8);
@@ -158,7 +158,7 @@ uint16_t rdRegE(uint8_t address,uint8_t microEdit,uint8_t maddr,uint8_t bitm8){
 	else
 		return rdReg16(address);
 }
-uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16_t newVal,uint8_t maddr,uint8_t bitm8){
+static uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16_t newVal,uint8_t maddr,uint8_t bitm8){
 	if(write){
 		if(microEdit){
 			wrReg16(0xC6,address|(1<<13)|(maddr<<8)|(bitm8<<15));
@@ -170,7 +170,7 @@ uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16_t newV
 	redrawT(address,newVal,microEdit,maddr,bitm8);
 	return newVal;
 }
-uint8_t changeId(int oldid,char change){
+static uint8_t changeId(int oldid,char change){
 	oldid+=change;
 	if(oldid<0)
 		oldid=26;
@@ -180,6 +180,26 @@ uint8_t changeId(int oldid,char change){
 		oldid=0;
 	return oldid;
 }
+#ifdef MT9D111
+static void redrawGUI(uint8_t mico)
+#else
+static void redrawGUI(void)
+#endif
+{
+	tft_paintScreenBlack();
+	tft_drawStringP(PSTR("val"),124,320,2,WHITE);
+	tft_drawStringP(PSTR("+"),124,256,4,WHITE);
+	tft_drawStringP(PSTR("-"),124,224,4,WHITE);
+	tft_drawStringP(PSTR("+16"),124,192,3,WHITE);
+	tft_drawStringP(PSTR("-16"),124,96,3,WHITE);
+	tft_drawStringP(PSTR("reg"),156,320,2,WHITE);
+	tft_drawStringP(PSTR("+"),156,256,4,WHITE);
+	tft_drawStringP(PSTR("-"),156,224,4,WHITE);
+	tft_drawStringP(PSTR("Exit"),188,320,3,WHITE);
+	tft_drawStringP(PSTR("Step"),188,232,3,WHITE);
+	tft_drawStringP(PSTR("Snap"),188,128,4,WHITE);
+}
+
 void editRegs(uint8_t microedit)
 #else
 void editRegs(void)
@@ -386,7 +406,7 @@ void editRegs(void)
 		}*/
 	}//end of loop
 }
-uint16_t leadingZeros(char * buf,uint8_t x){
+static uint16_t leadingZeros(char * buf,uint8_t x){
 	uint8_t len=strlen((const char *)buf);
 	uint16_t len2=320;
 	len=8-len;

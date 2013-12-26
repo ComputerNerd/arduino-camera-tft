@@ -13,7 +13,7 @@
 #include "filebrowser.h"
 #include "exiticon.h"
 #ifndef MT9D11
-void setmatrix(uint8_t id){
+static void setmatrix(uint8_t id){
 	switch (id) {
 		case 0:
 			#ifdef ov7670
