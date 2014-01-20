@@ -137,7 +137,7 @@ AVRDUDE_PORT=/dev/ttyACM0
 HEXFORMAT=ihex
 
 # compiler
-CFLAGS=-pipe -fomit-frame-pointer -g -I. $(INC)  -mmcu=$(MCU) -O$(OPTLEVEL) \
+CFLAGS=-pipe -fomit-frame-pointer -mrelax -g -I. $(INC)  -mmcu=$(MCU) -O$(OPTLEVEL) \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
 	-Wall -Wstrict-prototypes               \

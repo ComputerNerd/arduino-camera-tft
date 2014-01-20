@@ -8,7 +8,7 @@
 #include <stdlib.h>
 static uint8_t DisplayDirect;
 
-inline void tft_all_pin_input(void){
+static inline void tft_all_pin_input(void){
 #ifdef MEGA
 	DDRA=0;
 #endif
@@ -17,7 +17,7 @@ inline void tft_all_pin_input(void){
 	DDRB &=~ 0x03;
 #endif
 }
-inline void tft_all_pin_output(void){
+static inline void tft_all_pin_output(void){
 #ifdef MEGA
 	DDRA=0xff;
 #endif
@@ -26,7 +26,7 @@ inline void tft_all_pin_output(void){
 	DDRB |= 0x03;
 #endif
 }
-inline void tft_all_pin_low(void){
+static inline void tft_all_pin_low(void){
 #ifdef MEGA	
 	PORTA=0;
 #endif
@@ -35,7 +35,7 @@ inline void tft_all_pin_low(void){
 	PORTB &=~ 0x03;
 #endif
 }
-inline void tft_pushData(unsigned char data){
+static inline void tft_pushData(unsigned char data){
 #ifdef SEEEDUINO
 	tft_all_pin_low();
 	PORTD |= (data<<2);
@@ -45,7 +45,7 @@ inline void tft_pushData(unsigned char data){
 	PORTA=data;
 #endif
 }
-inline void tft_sendCommand(uint8_t index){
+static void tft_sendCommand(uint8_t index){
 	#ifdef MEGA
 		DDRA=0xFF;
 		PORTA=0;
@@ -71,7 +71,7 @@ inline void tft_sendCommand(uint8_t index){
 	WR_HIGH;
 	CS_HIGH;
 }
-inline void tft_sendCommandf(uint8_t index){
+static void tft_sendCommandf(uint8_t index){
 	#ifdef MEGA
 		DDRA=0xFF;
 		PORTA=0;
@@ -97,7 +97,7 @@ inline void tft_sendCommandf(uint8_t index){
 	WR_HIGH;
 	//CS_HIGH;
 }
-inline void tft_sendData(uint16_t data){
+void tft_sendData(uint16_t data){
 	CS_LOW;
 	RS_HIGH;
 	RD_HIGH;
@@ -117,7 +117,7 @@ inline void tft_sendData(uint16_t data){
 	WR_HIGH;
 	CS_HIGH;
 }
-inline void tft_sendDataf(uint16_t data){
+static void tft_sendDataf(uint16_t data){
 	//CS_LOW;
 	RS_HIGH;
 	//RD_HIGH;
@@ -137,7 +137,7 @@ inline void tft_sendDataf(uint16_t data){
 	WR_HIGH;
 	//CS_HIGH;
 }
-void tft_exitStandBy(void){
+static void tft_exitStandBy(void){
 	tft_sendCommand(0x0010);
 	tft_sendData(0x14E0);
 	//tft_sendData(0x1480);
@@ -153,7 +153,7 @@ void tft_setOrientation(uint8_t HV){//horizontal or vertical
 		tft_sendData(0x5030);
 	tft_sendCommand(0x0022); //Start to write to display RAM
 }
-uint8_t tft_getData(void){
+static uint8_t tft_getData(void){
 	#ifdef MEGA
 		return PINA;
 	#else
@@ -164,8 +164,8 @@ uint8_t tft_getData(void){
 		return data;
 	#endif
 }
-unsigned int tft_readRegister(unsigned int index){
-	unsigned int data;
+uint16_t tft_readRegister(uint8_t index){
+	uint16_t data;
 
 	CS_LOW;
 	RS_LOW;
@@ -215,10 +215,9 @@ void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length
 	tft_setOrientation(1);
 	if(length+poY>MAX_Y)
 		length=MAX_Y-poY;
-	uint16_t i;
 	CS_LOW;
 	RD_HIGH;
-	for(i=0;i<length;++i)
+	while(length--)
 		tft_sendDataf(color);
 	CS_HIGH;
 }
@@ -569,11 +568,6 @@ void tft_init(void){
 	_delay_ms(50);
 	tft_exitStandBy();
 	tft_sendCommand(0x0022);
-
 	//paint screen black
 	tft_paintScreenBlack();
-	//try disabling backlight
-	uint16_t powerOld=tft_readRegister(0x10);
-	powerOld&=~(1<<7);
-	
 }

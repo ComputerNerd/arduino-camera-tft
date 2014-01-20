@@ -119,10 +119,8 @@ This is heavily based on seeed's library but is ported to avr-gcc
 #define RIGHT2LEFT 2
 #define UP2DOWN	3
 extern unsigned char simpleFont[][8];
-
-void tft_pushData(unsigned char data);
+uint16_t tft_readRegister(uint8_t index);
 void tft_setOrientation(uint8_t HV);
-unsigned char tft_getData(void);
 void tft_sendData(unsigned int data);
 void tft_setXY(uint16_t poX, uint16_t poY);
 void tft_setDisplayDirect(unsigned char Direction);
@@ -139,9 +137,5 @@ void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y);
 void tft_drawImageVf_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y);
 void tft_drawCircle(int poX, int poY, int r,uint16_t color);
 void tft_fillCircle(int poX, int poY, int r,uint16_t color);
-void tft_all_pin_output(void);
-void tft_all_pin_low(void);
-void tft_all_pin_input(void);
-void tft_exitStandBy(void);
 void tft_init(void);
 #endif
