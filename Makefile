@@ -159,7 +159,7 @@ ASMFLAGS =-I. $(INC) -mmcu=$(MCU)        \
 
 
 # linker
-LDFLAGS= -Wl,-gc-sections,-Map,$(TRG).map -flto -mmcu=$(MCU) \
+LDFLAGS=$(CFLAGS) -Wl,-gc-sections,-Map,$(TRG).map -flto -mmcu=$(MCU) \
 	-lm $(LIBS)
 
 ##### executables ####
