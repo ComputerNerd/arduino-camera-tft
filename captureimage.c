@@ -185,6 +185,8 @@ uint32_t capJpeg(void){
 		while (!(PINE&16)){}//wait for high
 	}
 	sei();
+	//Return number of bytes read
+	
 }
 #endif
 void capImg(void){

@@ -191,6 +191,10 @@ void MT9D111Refresh(void){
 	wrReg16(0xC6,0xA103);
 	wrReg16(0xC8,5);//refresh
 }
+void MT9D111DoPreview(void){
+	wrReg16(0xC6,0xA103);
+	wrReg16(0xC8,1);
+}
 void setMT9D111res(uint16_t w,uint16_t h){
 	wrReg16(0xF0,1);
 	wrReg16(0xC6,(1<<13)|(7<<8)|3);
@@ -252,6 +256,23 @@ void wrSensorRegs8_8(const struct regval_list reglist[]){
 	   	next++;
 	}
 }
+
+#ifdef MT9D111
+/*
+Bits 7:0 of address for physical access; driver variable offset for logical access.
+Bits 12:8 of address for physical access; driver ID for logical access.
+Bits 14:13 of address for physical access; R0xC6:1[14:13] = 01 select logical access.
+1 = 8-bit access; 0 = 16-bit access
+*/
+void waitStateMT9D111(uint8_t state){
+	wrReg16(0xF0,1);//Set to page 1
+	do{
+		_delay_ms(10);
+		wrReg16(0xC6,(1<<15)|(1<<13)|(1<<8)|4);
+	}while(rdReg16(0xC8)!=state);
+}
+#endif
+
 #ifdef ov7670
 void initCam(uint8_t bayerUse)
 #else
@@ -265,11 +286,16 @@ void initCam(void)
 		//wrSensorRegs8_16(MT9D111_QVGA);
 		//wrSensorRegs8_16(MT9D111_RGB565);
 		//wrSensorRegs8_16(default_size_a_list);
+		
+		//Start off with a soft reset
+		wrReg16(0xF0,1);//Set to page 1
+		wrReg16(0xC3,0x0501);
 		wrReg16(0xF0,0);
-		wrReg16(0xF2,0);
-		wrReg16(0xF0,1);
-		wrReg16(0xC6,(1<<13)|(7<<8)|107);//Fifo context A
-		wrReg16(0xC8,0);
+		wrReg16(0x0D,0x0021);
+		wrReg16(0x0D,0);
+		_delay_ms(10);//Cannot use i2c for 24 camera cylces this should be way over that.
+		waitStateMT9D111(3);
+		//Poll camera until it is ready
 		/*wrReg16(0xC6,(1<<13)|(7<<8)|25);//Row speed
 		wrReg16(0xC8,3);*/
 		wrReg16(0xC6,(1<<15)|(1<<13)|(2<<8)|14);//increase maximum intergration time
@@ -280,11 +306,16 @@ void initCam(void)
 		wrReg16(0xc8,224);*/
 		wrReg16(0xC6,(1<<13)|(2<<8)|20);//increase maximum pre-lc digital gain
 		wrReg16(0xc8,256);
-		wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|67);//gamma contex A
+		/*wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|67);//gamma contex A
 		wrReg16(0xC8,2);
 		wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|68);//gamma B
-		wrReg16(0xC8,2);
-		MT9D111Refresh();
+		wrReg16(0xC8,2);*/
+		//MT9D111Refresh();
+		//_delay_ms(1000);
+		wrReg16(0xC6,(1<<13)|(7<<8)|107);//Fifo context A
+		wrReg16(0xC8,0);
+		//MT9D111Refresh();
+		//_delay_ms(1000);
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode
 		wrReg(0x11,16);//divider

@@ -129,8 +129,10 @@ uint8_t selection(const char ** table,uint8_t maxitems){
     RD_HIGH;
     DDRA=0xFF;
     z=31<<8;
-	for(item=0;item<240;++item){
-		for(x=0;x<320;++x){
+	item=240;
+	while(item--){
+		x=320;
+		while(x--){
 			WR_HIGH;
 			PORTA=0;
 			WR_LOW;
@@ -410,7 +412,7 @@ theEnd:
 								uint16_t cpybuf[320];
 								uint16_t w;
 								uint8_t h;
-								uint16_t written;
+								UINT written;
 								for (h=0;h<240;++h){
 									for (w=0;w<320;++w){
 										tft_setXY(h,w);
