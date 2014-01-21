@@ -204,6 +204,67 @@ static void loadJpeg(char * path,char * fn){
 	f_close(&File);
 	waitTouchUP();
 }
+#define CLIP(X) ( (X) > 255 ? 255 : (X) < 0 ? 0 : X)
+#define C(Y) ( (Y) - 16  )
+#define D(U) ( (U) - 128 )
+#define E(V) ( (V) - 128 )
+#define YUV2R(Y, U, V) CLIP(( 298 * C(Y) + 409 * E(V) + 128) >> 8)
+#define YUV2G(Y, U, V) CLIP(( 298 * C(Y) - 100 * D(U) - 208 * E(V) + 128) >> 8)
+#define YUV2B(Y, U, V) CLIP(( 298 * C(Y) + 516 * D(U) + 128) >> 8)
+static void loadRaw(char * path,char * fn){
+	char fp[256];
+	getfp(path,fn,fp);
+	FRESULT res=f_open(&File,fp,FA_READ);
+	if(res!=FR_OK){
+		put_rc(res,64,320);
+		f_close(&File);
+		return;
+	}
+	FILINFO img;
+	f_stat(fp,&img);
+	int w,h;
+	char tmpS[32];
+	//itoa(img.fsize,tmpS,10);
+	//tft_drawString(tmpS,24,320,3,WHITE);
+	switch(img.fsize){
+		case (320*240*2):
+			w=320;
+			h=240;
+		break;
+		default:
+			w=h=-1;
+	}
+	w=320;
+	h=240;
+	if((w>0)&&(h>0)){
+		uint16_t x;
+		uint8_t y;
+		uint8_t yuvDat[4];
+		UINT bread;
+		f_read(&File,yuvDat,3,&bread);
+		for (y=0;y<h;++y){
+			x=w/2;
+			while(x--){
+				f_read(&File,yuvDat,4,&bread);
+				uint8_t rgb[6];
+				rgb[0]=YUV2R((int32_t)yuvDat[0],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				rgb[1]=YUV2G((int32_t)yuvDat[0],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				rgb[2]=YUV2B((int32_t)yuvDat[0],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				rgb[3]=YUV2R((int32_t)yuvDat[2],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				rgb[4]=YUV2G((int32_t)yuvDat[2],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				rgb[5]=YUV2B((int32_t)yuvDat[2],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				uint16_t p=((rgb[3] & 0xF8) << 8) | ((rgb[4] & 0xFC) << 3) | (rgb[5] >> 3); 
+				tft_setXY(y,x*2);
+				tft_sendData(p);
+				p=((rgb[0] & 0xF8) << 8) | ((rgb[1] & 0xFC) << 3) | (rgb[2] >> 3);
+				tft_setXY(y,x*2+1);
+				tft_sendData(p);
+			}
+		}
+	}
+	f_close(&File);
+	waitTouchUP();
+}
 void browserSD(void){
 	FRESULT res;
 	DIR Dir;
@@ -306,6 +367,8 @@ void browserSD(void){
 							++ext;
 							if(strcmp("JPG",ext)==0)
 								loadJpeg(currentDir,fn);
+							else if(strcmp("RAW",ext)==0)
+								loadRaw(currentDir,fn);
 							//return files back to correct position
 							f_closedir(&Dir);
 							res=f_opendir(&Dir,currentDir);
