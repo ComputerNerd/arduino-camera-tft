@@ -80,7 +80,6 @@ void main(void){
 	uint8_t error;
 	tft_init();//init TFT library
 	tft_setDisplayDirect(DOWN2UP);
-	tft_drawStringP(PSTR("setup"),0,320,1,WHITE);
 	#ifdef haveSDcard
 		OCR2A = 155;//F_CPU / 1024 / 100 - 1;
 		TCCR2A=2;//CTC mode
@@ -91,7 +90,6 @@ void main(void){
 	sei();
 	TWSR&=(uint8_t)~3;//disable prescaler for TWI
 	TWBR=72;//set to 100khz
-	tft_drawStringP(PSTR("setup 2"),8,320,1,WHITE);
 	#ifdef ov7670
 		configSel();
 	#else
@@ -105,7 +103,6 @@ void main(void){
 		tft_drawStringP(PSTR("initized"),32,320,1,WHITE);
 		f_mount(&FatFs, "0:", 0);		/* Give a work area to the default drive */
 		tft_drawStringP(PSTR("mounted"),40,320,1,WHITE);
-		_delay_ms(1000);
 	#endif
 	menu();
 }
@@ -170,7 +167,7 @@ static uint16_t updateReg(uint8_t address,uint8_t microEdit,uint8_t write,uint16
 	redrawT(address,newVal,microEdit,maddr,bitm8);
 	return newVal;
 }
-static uint8_t changeId(int oldid,char change){
+static uint8_t changeId(int oldid,int8_t change){
 	oldid+=change;
 	if(oldid<0)
 		oldid=26;
@@ -209,12 +206,6 @@ void editRegs(void)
 	#ifdef MT9D111
 		uint16_t val;
 		wrReg16(0xF0,2);
-		if(rdReg16(0x0D)!=0){
-			tft_fillRectangle(0,320,112,320,BLACK);
-			tft_drawStringP(PSTR("Warning 0x0D"),0,320,1,WHITE);
-			_delay_ms(1000);
-			wrReg16(0x0D,0);
-		}
 	#else
 		uint8_t val;
 	#endif
@@ -375,7 +366,7 @@ void editRegs(void)
 					#endif
 				}else if (y <= 224 && y >= 192){
 					#ifdef MT9D111
-						if(address==0)
+						if((address==0)&&microedit)
 							maddr=changeId(maddr,-1);
 						else
 					#endif
@@ -391,7 +382,7 @@ void editRegs(void)
 				}
 			}
 		}
-		/*#ifdef MT9D111
+		#ifdef MT9D111
 			uint16_t val2=rdRegE(address,microedit,maddr,bitm8);
 		#else
 			uint8_t val2=rdReg(address);
@@ -403,7 +394,7 @@ void editRegs(void)
 			#else
 				redrawT(address,val);
 			#endif
-		}*/
+		}
 	}//end of loop
 }
 static uint16_t leadingZeros(char * buf,uint8_t x){

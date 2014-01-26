@@ -170,6 +170,39 @@ void configSel(void){
 	initCam(selection((const char**)config_tab,3));
 }
 #endif
+
+#ifdef MT9D111
+static const uint8_t jpegHeader[] PROGMEM ={//619 bytes
+255,216,255,224,0,16,74,70,73,70,0,1,2,0,0,1,0,1,0,0,255,219,0,132,0,28,19,21,25,21,18,28,
+25,23,25,32,30,28,33,42,70,46,42,39,39,42,86,61,65,51,70,102,89,107,105,100,89,98,96,112,126,161,137,112,
+119,152,121,96,98,140,191,142,152,166,172,180,182,180,109,135,198,212,196,175,210,161,177,180,173,1,30,32,32,42,37,42,
+82,46,46,82,173,116,98,116,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,
+173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,173,255,192,0,17,8,4,
+176,6,64,3,0,33,0,1,17,1,2,17,1,255,196,0,31,0,0,1,5,1,1,1,1,1,1,0,0,0,0,0,
+0,0,0,1,2,3,4,5,6,7,8,9,10,11,255,196,0,181,16,0,2,1,3,3,2,4,3,5,5,4,4,0,
+0,1,125,1,2,3,0,4,17,5,18,33,49,65,6,19,81,97,7,34,113,20,50,129,145,161,8,35,66,177,193,21,
+82,209,240,36,51,98,114,130,9,10,22,23,24,25,26,37,38,39,40,41,42,52,53,54,55,56,57,58,67,68,69,70,
+71,72,73,74,83,84,85,86,87,88,89,90,99,100,101,102,103,104,105,106,115,116,117,118,119,120,121,122,131,132,133,134,
+135,136,137,138,146,147,148,149,150,151,152,153,154,162,163,164,165,166,167,168,169,170,178,179,180,181,182,183,184,185,186,194,
+195,196,197,198,199,200,201,202,210,211,212,213,214,215,216,217,218,225,226,227,228,229,230,231,232,233,234,241,242,243,244,245,
+246,247,248,249,250,255,196,0,31,1,0,3,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,2,3,4,5,
+6,7,8,9,10,11,255,196,0,181,17,0,2,1,2,4,4,3,4,7,5,4,4,0,1,2,119,0,1,2,3,17,
+4,5,33,49,6,18,65,81,7,97,113,19,34,50,129,8,20,66,145,161,177,193,9,35,51,82,240,21,98,114,209,10,
+22,36,52,225,37,241,23,24,25,26,38,39,40,41,42,53,54,55,56,57,58,67,68,69,70,71,72,73,74,83,84,85,
+86,87,88,89,90,99,100,101,102,103,104,105,106,115,116,117,118,119,120,121,122,130,131,132,133,134,135,136,137,138,146,147,
+148,149,150,151,152,153,154,162,163,164,165,166,167,168,169,170,178,179,180,181,182,183,184,185,186,194,195,196,197,198,199,200,
+201,202,210,211,212,213,214,215,216,217,218,226,227,228,229,230,231,232,233,234,242,243,244,245,246,247,248,249,250,255,218,0,
+12,3,0,0,1,17,2,17,0,63,0};
+#endif
+static inline void serialWrB(uint8_t dat){
+	UDR0=dat;
+	while (!( UCSR0A & (1<<UDRE0))); //wait for byte to transmit
+}
+static void BSend(void){
+	uint16_t res=tft_readRegister(0x22);
+	serialWrB(res>>8);
+	serialWrB(res&255);
+}
 void menu(void){
 	uint16_t x,y,z;
 	while (1){
@@ -188,6 +221,9 @@ void menu(void){
 		break;
 		case 1:
 			#ifdef MT9D111
+				setRes(qvga);
+				setColor(rgb565);
+				MT9D111Refresh();
 				editRegs(1);
 			#else
 				#ifdef ov7740
@@ -305,7 +341,8 @@ void menu(void){
 						#ifdef ov7670
 							wrReg(REG_COM7, COM7_BAYER); // BGBGBG... GRGRGR...
 						#elif defined MT9D111
-							//setupt jpeg
+							//setup jpeg
+							MT9D111JPegCapture();
 						#endif
 					break;
 					case 1:
@@ -331,15 +368,44 @@ void menu(void){
 						wrReg(0x11,1);
 					else
 						wrReg(0x11,2);
-				#elif defined MT9D111
-					MT9D111Refresh();
 				#endif
 				tft_setOrientation(1);
 				do{
 					#ifdef MT9D111
 						switch(reso){
 							case 0:
-								capJpeg();
+								{uint32_t jpgSize=capJpeg();
+								serialWrB('R');
+								serialWrB('D');
+								serialWrB('Y');
+								uint16_t w;
+								uint8_t h=0;
+								serialWrB(jpgSize&255);
+								serialWrB(jpgSize>>8);
+								serialWrB(jpgSize>>16);
+								serialWrB(jpgSize>>24);
+								while(jpgSize){
+									if(jpgSize>=640){
+										for (w=0;w<320;++w){
+											tft_setXY(h,w);
+											BSend();
+										}
+										++h;
+										jpgSize-=640;
+									}else{
+										for(w=0;w<jpgSize/2;++w){
+											tft_setXY(h,w);
+											BSend();
+										}
+										if(jpgSize&1){
+											tft_setXY(h,w);
+											uint16_t res=tft_readRegister(0x22);
+											serialWrB(res>>8);
+										}
+										jpgSize=0;
+									}
+								}
+								}
 							break;
 							case 1:
 								capImgPC();
@@ -393,10 +459,15 @@ theEnd:
 					break;
 					case 1:
 						//time lapse
-						setRes(qvga);
-						setColor(yuv422);
 						#ifdef MT9D111
-							MT9D111Refresh();
+							//MT9D111Refresh();
+							//Since This is a time lapse we want to be in "video" mode
+							MT9D111JPegCapture();
+							/*do{
+								_delay_ms(10);
+								wrReg16(0xC6,(1<<15)|(1<<13)|(1<<8)|4);
+							}while(rdReg16(0xC8)<4);
+							waitStateMT9D111(3);*/
 						#endif
 						{
 							char buf[24];
@@ -404,15 +475,55 @@ theEnd:
 							tft_setOrientation(1);
 							do{
 								FIL Fo;
-								capImg();
+								#ifdef MT9D111
+									uint32_t jpgSize=capJpeg();
+								#else
+									capImg();
+								#endif
 								utoa(imgc,buf,10);
+								#ifdef MT9D111
+								strcat(buf,".JPG");
+								#else
 								strcat(buf,".RAW");
+								#endif
 								f_open(&Fo,buf,FA_WRITE|FA_CREATE_ALWAYS);
 								++imgc;
-								uint16_t cpybuf[320];
+								UINT written;
 								uint16_t w;
 								uint8_t h;
-								UINT written;
+								uint16_t cpybuf[320];
+								#ifdef MT9D111
+									h=0;
+									uint8_t * cpyptr=cpybuf;
+									for(w=0;w<619;++w)
+										*cpyptr++=pgm_read_byte_near(jpegHeader+w);
+									f_write(&Fo,cpybuf,619,&written);
+									while(jpgSize){
+										if(jpgSize>=640){
+											for (w=0;w<320;++w){
+												tft_setXY(h,w);
+												cpybuf[w]=__builtin_bswap16(tft_readRegister(0x22));//Either bytes need to be swaped or a byte is being missed
+											}
+											f_write(&Fo,cpybuf,640,&written);
+											++h;
+											jpgSize-=640;
+										}else{
+											for(w=0;w<jpgSize/2;++w){
+												tft_setXY(h,w);
+												cpybuf[w]=__builtin_bswap16(tft_readRegister(0x22));
+											}
+											f_write(&Fo,cpybuf,jpgSize,&written);
+											if(jpgSize&1){
+												tft_setXY(h,w);
+												cpybuf[w]=tft_readRegister(0x22);
+												f_write(&Fo,&cpybuf[w],1,&written);
+											}
+											jpgSize=0;
+										}
+									}
+									cpybuf[0]=0xFFD9;
+									f_write(&Fo,cpybuf,2,&written);
+								#else
 								for (h=0;h<240;++h){
 									for (w=0;w<320;++w){
 										tft_setXY(h,w);
@@ -420,10 +531,14 @@ theEnd:
 									}
 									f_write(&Fo,cpybuf,640,&written);
 								}
+								#endif
 								f_close(&Fo);
 								getPoint(&x,&y,&z);
 							}while(z<10);
 							tft_setDisplayDirect(DOWN2UP);
+							#ifdef MT9D111
+								MT9D111DoPreview();
+							#endif
 						}
 					break;
 					case 2:

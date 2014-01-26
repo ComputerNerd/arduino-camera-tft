@@ -201,6 +201,14 @@ void setMT9D111res(uint16_t w,uint16_t h){
 	wrReg16(0xC8,w);
 	wrReg16(0xC6,(1<<13)|(7<<8)|5);
 	wrReg16(0xC8,h);
+	/*wrReg16(0xC6,(1<<13)|(7<<8)|107);//Fifo context A
+	wrReg16(0xC8,1|(1<<5));
+	wrReg16(0xC6,(1<<13)|(7<<8)|114);//Fifo context B
+	wrReg16(0xC8,1|(1<<5));
+	wrReg16(0xC6,(1<<13)|(7<<8)|121);
+	wrReg16(0xC8,1600);
+	wrReg16(0xC6,(1<<13)|(7<<8)|123);
+	wrReg16(0xC8,h);*/
 }
 #endif
 void setRes(uint8_t res){
@@ -262,14 +270,38 @@ void wrSensorRegs8_8(const struct regval_list reglist[]){
 Bits 7:0 of address for physical access; driver variable offset for logical access.
 Bits 12:8 of address for physical access; driver ID for logical access.
 Bits 14:13 of address for physical access; R0xC6:1[14:13] = 01 select logical access.
-1 = 8-bit access; 0 = 16-bit access
+Bit  15 1 = 8-bit access; 0 = 16-bit access
 */
 void waitStateMT9D111(uint8_t state){
 	wrReg16(0xF0,1);//Set to page 1
 	do{
-		_delay_ms(10);
+		_delay_ms(25);
 		wrReg16(0xC6,(1<<15)|(1<<13)|(1<<8)|4);
 	}while(rdReg16(0xC8)!=state);
+}
+void MT9D111JPegCapture(void){
+	wrReg16(0xF0,1);
+	
+	wrReg16(0xC6,(1<<15)|(1<<13)|(1<<8)|32);
+	wrReg16(0xc8,2);//Enable video
+
+	
+	wrReg16(0xC6,(1<<15)|(1<<13)|(9<<8)|7);
+	wrReg16(0xC8,(1<<4)|1);//Use scaled table video
+	wrReg16(0xC6,(1<<15)|(1<<13)|(9<<8)|10);
+	wrReg16(0xC8,56|(1<<7));//Qscale
+	
+	wrReg16(0xC6,(1<<15)|(1<<13)|(9<<8)|11);
+	wrReg16(0xC8,56|(1<<7));//Qscale
+	
+	wrReg16(0xC6,(1<<15)|(1<<13)|(9<<8)|12);
+	wrReg16(0xC8,56|(1<<7));//Qscale
+
+	wrReg16(0xC6,(1<<13)|(7<<8)|11);
+	wrReg16(0xC8,0);//Enable JPEG
+
+	wrReg16(0xC6,(1<<15)|(1<<13)|(1<<8)|3);
+	wrReg16(0xc8,2);//Actully run the capture
 }
 #endif
 
@@ -288,13 +320,18 @@ void initCam(void)
 		//wrSensorRegs8_16(default_size_a_list);
 		
 		//Start off with a soft reset
+
+		
 		wrReg16(0xF0,1);//Set to page 1
 		wrReg16(0xC3,0x0501);
 		wrReg16(0xF0,0);
 		wrReg16(0x0D,0x0021);
 		wrReg16(0x0D,0);
-		_delay_ms(10);//Cannot use i2c for 24 camera cylces this should be way over that.
+		_delay_ms(100);//Cannot use i2c for 24 camera cylces this should be way over that.
 		waitStateMT9D111(3);
+		//wrReg16(0xF0,0);//Set to page 0
+		//wrReg16(0x15,(1<<7)|3);
+		wrReg16(0xF0,1);//Set to page 1
 		//Poll camera until it is ready
 		/*wrReg16(0xC6,(1<<13)|(7<<8)|25);//Row speed
 		wrReg16(0xC8,3);*/
@@ -314,7 +351,9 @@ void initCam(void)
 		//_delay_ms(1000);
 		wrReg16(0xC6,(1<<13)|(7<<8)|107);//Fifo context A
 		wrReg16(0xC8,0);
-		//MT9D111Refresh();
+		wrReg16(0xC6,(1<<13)|(7<<8)|114);//Fifo context B
+		wrReg16(0xC8,0);
+		MT9D111Refresh();
 		//_delay_ms(1000);
 	#elif defined ov7740
 		wrReg(0x12,rdReg(0x12)|1);//RGB mode

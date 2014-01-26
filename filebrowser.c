@@ -241,18 +241,18 @@ static void loadRaw(char * path,char * fn){
 		uint8_t y;
 		uint8_t yuvDat[4];
 		UINT bread;
-		f_read(&File,yuvDat,3,&bread);
+		//f_read(&File,yuvDat,2,&bread);
 		for (y=0;y<h;++y){
 			x=w/2;
 			while(x--){
 				f_read(&File,yuvDat,4,&bread);
 				uint8_t rgb[6];
-				rgb[0]=YUV2R((int32_t)yuvDat[0],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
-				rgb[1]=YUV2G((int32_t)yuvDat[0],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
-				rgb[2]=YUV2B((int32_t)yuvDat[0],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
-				rgb[3]=YUV2R((int32_t)yuvDat[2],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
-				rgb[4]=YUV2G((int32_t)yuvDat[2],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
-				rgb[5]=YUV2B((int32_t)yuvDat[2],(int32_t)yuvDat[1],(int32_t)yuvDat[3]);
+				rgb[0]=YUV2R((int32_t)yuvDat[0],(int32_t)yuvDat[3],(int32_t)yuvDat[1]);
+				rgb[1]=YUV2G((int32_t)yuvDat[0],(int32_t)yuvDat[3],(int32_t)yuvDat[1]);
+				rgb[2]=YUV2B((int32_t)yuvDat[0],(int32_t)yuvDat[3],(int32_t)yuvDat[1]);
+				rgb[3]=YUV2R((int32_t)yuvDat[2],(int32_t)yuvDat[3],(int32_t)yuvDat[1]);
+				rgb[4]=YUV2G((int32_t)yuvDat[2],(int32_t)yuvDat[3],(int32_t)yuvDat[1]);
+				rgb[5]=YUV2B((int32_t)yuvDat[2],(int32_t)yuvDat[3],(int32_t)yuvDat[1]);
 				uint16_t p=((rgb[3] & 0xF8) << 8) | ((rgb[4] & 0xFC) << 3) | (rgb[5] >> 3); 
 				tft_setXY(y,x*2);
 				tft_sendData(p);
