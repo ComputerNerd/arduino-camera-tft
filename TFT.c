@@ -398,7 +398,11 @@ void tft_paintScreenBlack(void){
 }
 void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 	uint16_t a,b;
-	DDRA=0xFF;
+	#ifdef MEGA
+		DDRA=0xFF;
+	#elif defined(SEEEDUINO)
+		tft_all_pin_output();
+	#endif
 	tft_setOrientation(1);
 	for(b=y;b<h+y;++b){
 		tft_setXY(b,x);
@@ -407,12 +411,21 @@ void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 		RD_HIGH;
 		dat+=(w-1)*2;
 		for(a=0;a<w;++a){
-			WR_LOW;
-			PORTA=pgm_read_byte(dat+1);
-			WR_HIGH;
-			WR_LOW;
-			PORTA=pgm_read_byte(dat);
-			WR_HIGH;
+			#ifdef MEGA
+				WR_LOW;
+				PORTA=pgm_read_byte(dat+1);
+				WR_HIGH;
+				WR_LOW;
+				PORTA=pgm_read_byte(dat);
+				WR_HIGH;
+			#elif defined(SEEEDUINO)
+				WR_LOW;
+				tft_pushData(dat+1);
+				WR_HIGH;
+				WR_LOW;
+				tft_pushData(dat);
+				WR_HIGH;
+			#endif
 			dat-=2;
 		}
 		dat+=(w+1)*2;
@@ -421,7 +434,11 @@ void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 }
 void tft_drawImage(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 	uint16_t a,b;
-	DDRA=0xFF;
+	#ifdef MEGA
+		DDRA=0xFF;
+	#elif defined(SEEEDUINO)
+		tft_all_pin_output();
+	#endif
 	tft_setOrientation(1);
 	for(b=y;b<h+y;++b){
 		tft_setXY(b,x);
@@ -431,10 +448,18 @@ void tft_drawImage(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 		dat+=(w-1)*2;
 		for(a=0;a<w;++a){
 			WR_LOW;
-			PORTA=dat[1];
+			#ifdef MEGA
+				PORTA=dat[1];
+			#elif defined(SEEEDUINO)
+				tft_pushData(dat[1]);
+			#endif
 			WR_HIGH;
 			WR_LOW;
-			PORTA=*dat;
+			#ifdef MEGA
+				PORTA=*dat;
+			#elif defined(SEEEDUINO)
+				tft_pushData(*dat);
+			#endif
 			WR_HIGH;
 			dat-=2;
 		}
@@ -445,7 +470,11 @@ void tft_drawImage(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 void tft_drawImageVf_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y){
 	uint16_t a;
 	int16_t b;
-	DDRA=0xFF;
+	#ifdef MEGA
+		DDRA=0xFF;
+	#elif defined(SEEEDUINO)
+		tft_all_pin_output();
+	#endif
 	tft_setOrientation(1);
 	for(b=y+h-1;b>=y;--b){
 		tft_setXY(b,x);
@@ -455,10 +484,18 @@ void tft_drawImageVf_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y)
 		dat+=(w-1)*2;
 		for(a=0;a<w;++a){
 			WR_LOW;
-			PORTA=pgm_read_byte(dat+1);
+			#ifdef MEGA
+				PORTA=pgm_read_byte(dat+1);
+			#elif defined(SEEEDUINO)
+				tft_pushData(pgm_read_byte(dat+1));
+			#endif
 			WR_HIGH;
 			WR_LOW;
-			PORTA=pgm_read_byte(dat);
+			#ifdef MEGA
+				PORTA=pgm_read_byte(dat);
+			#elif defined(SEEEDUINO)
+				tft_pushData(pgm_read_byte(dat));
+			#endif
 			WR_HIGH;
 			dat-=2;
 		}
