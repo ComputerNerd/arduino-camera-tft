@@ -78,7 +78,7 @@ static uint8_t listFiles(DIR * Dir){
 				tft_drawImage_P(folder_icon,32,25,xx-32,yy);
 				drawFile(fn,xx,yy+25);
 				}else{/* It is a file. */
-				//check extention
+				//check extension
 				char * ext=strrchr(fn,'.');
 				++ext;
 				if(strcmp("JPG",ext)==0)
@@ -145,7 +145,7 @@ UINT tjd_output (
 	JRECT* rect		// Rectangular region to output
 )
 {
-	jd = jd;	// Suppress warning (device identifier is not needed in this appication)
+	jd = jd;	// Suppress warning (device identifier is not needed in this application)
 
 	// Check user interrupt at left end
 	//if (!rect->left && uart_test()) return 0;	// Abort to decompression
@@ -354,7 +354,7 @@ void browserSD(void){
 							files=0;
 							break;
 						}else{/* It is a file. */
-							//check extention
+							//check extension
 							tft_paintScreenBlack();
 							tft_drawString(fn,0,320,3,WHITE);
 							do{

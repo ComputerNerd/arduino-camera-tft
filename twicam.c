@@ -30,7 +30,6 @@ void twiWriteByte(uint8_t DATA,uint8_t type){
 	++err;
 }
 void twiAddr(uint8_t addr,uint8_t typeTWI){
-	//This function does not do error checking
 	TWDR = addr;//send address
 	TWCR = _BV(TWINT) | _BV(TWEN);		/* clear interrupt to start transmission */
 	while ((TWCR & _BV(TWINT)) == 0);	/* wait for transmission */
