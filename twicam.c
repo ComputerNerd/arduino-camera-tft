@@ -167,7 +167,7 @@ void setColor(uint8_t color){
 				wrSensorRegs8_8(rgb565_ov7670);
 				{uint8_t temp=rdReg(0x11);
 				_delay_ms(1);
-				wrReg(0x11,temp);}//accorind to the linux kernel driver rgb565 PCLK needs re-writting
+				wrReg(0x11,temp);}//according to the Linux kernel driver rgb565 PCLK needs re-writing
 			#endif
 		break;
 		#ifndef MT9D111
@@ -200,14 +200,6 @@ void setMT9D111res(uint16_t w,uint16_t h){
 	wrReg16(0xC8,w);
 	wrReg16(0xC6,(1<<13)|(7<<8)|5);
 	wrReg16(0xC8,h);
-	/*wrReg16(0xC6,(1<<13)|(7<<8)|107);//Fifo context A
-	wrReg16(0xC8,1|(1<<5));
-	wrReg16(0xC6,(1<<13)|(7<<8)|114);//Fifo context B
-	wrReg16(0xC8,1|(1<<5));
-	wrReg16(0xC6,(1<<13)|(7<<8)|121);
-	wrReg16(0xC8,1600);
-	wrReg16(0xC6,(1<<13)|(7<<8)|123);
-	wrReg16(0xC8,h);*/
 }
 #endif
 void setRes(uint8_t res){
