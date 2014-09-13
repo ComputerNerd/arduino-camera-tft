@@ -124,8 +124,8 @@ UINT tjd_input (
 )
 {
 	WORD rb;
-	jd = jd;	// Suppress warning (device identifier is not needed in this appication)
-	if (buff){	// Read nd bytes from the input strem
+	jd = jd;	// Suppress warning (device identifier is not needed in this application)
+	if (buff){	// Read nd bytes from the input stream
 		PORTG|=1<<5;
 		f_read(&File,buff, nd, &rb);
 		PORTG&=~(1<<5);
