@@ -180,7 +180,7 @@ uint32_t capJpeg(void){
 		DDRC=0;
 		while (PINE&32){}//wait for low
 		while (!(PINE&32)){}//wait for high
-		do{//keep reading until no vaild jpeg data is output
+		do{//keep reading until no valid jpeg data is output
 			while (PINE&16){
 				if(!(PINE&32))
 					break;

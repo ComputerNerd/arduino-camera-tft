@@ -90,13 +90,13 @@ const char *const menu_tablep2[] PROGMEM = {
 	menup20,menup21,menup22
 };
 #ifdef ov7670
-const char maxtrix0[] PROGMEM = "Maxtrix yuv422";
-const char maxtrix1[] PROGMEM = "Maxtrix 2";
-const char maxtrix2[] PROGMEM = "Maxtrix rgb565";
+const char maxtrix0[] PROGMEM = "Matrix yuv422";
+const char maxtrix1[] PROGMEM = "Matrix 2";
+const char maxtrix2[] PROGMEM = "Matrix rgb565";
 const char *const maxtrix_table[] PROGMEM = {maxtrix0,maxtrix1,maxtrix2};
 #elif defined ov7740
-const char maxtrix0[] PROGMEM = "Maxtrix off";
-const char maxtrix1[] PROGMEM = "OVT Maxtrix";
+const char maxtrix0[] PROGMEM = "Matrix off";
+const char maxtrix1[] PROGMEM = "OVT Matrix";
 const char *const maxtrix_table[] PROGMEM = {maxtrix0,maxtrix1};
 #endif
 const char wb0[] PROGMEM="No AWB";
@@ -245,7 +245,7 @@ void menu(void){
 		break;
 		#ifndef MT9D111
 		case 3:
-			//compare matrixes
+			//compare matrices
 			tft_setOrientation(1);
 			do{
 				getPoint(&x,&y,&z);
@@ -502,7 +502,7 @@ theEnd:
 										if(jpgSize>=640){
 											for (w=0;w<320;++w){
 												tft_setXY(h,w);
-												cpybuf[w]=__builtin_bswap16(tft_readRegister(0x22));//Either bytes need to be swaped or a byte is being missed
+												cpybuf[w]=__builtin_bswap16(tft_readRegister(0x22));//Either bytes need to be swapped or a byte is being missed
 											}
 											f_write(&Fo,cpybuf,640,&written);
 											++h;
