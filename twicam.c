@@ -142,12 +142,12 @@ void wrSensorRegs8_16P(const struct regval_listP reglist[]){
 	}
 }
 #endif
-void setColor(uint8_t color){
+void setColor(enum COLORSPACE color){
 	#ifdef MT9D111
 		wrReg16(0xF0,1);
 	#endif
 	switch(color){
-		case yuv422:
+		case YUV422:
 			#ifdef MT9D111
 				wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|125);
 				wrReg16(0xC8,0);
@@ -157,7 +157,7 @@ void setColor(uint8_t color){
 				wrSensorRegs8_8(yuv422_ov7670);
 			#endif
 		break;
-		case rgb565:
+		case RGB565:
 			#ifdef MT9D111
 				wrReg16(0xC6,(1<<15)|(1<<13)|(7<<8)|125);
 				wrReg16(0xC8,(1<<5));
@@ -167,11 +167,11 @@ void setColor(uint8_t color){
 				wrSensorRegs8_8(rgb565_ov7670);
 				{uint8_t temp=rdReg(0x11);
 				_delay_ms(1);
-				wrReg(0x11,temp);}//according to the Linux kernel driver rgb565 PCLK needs re-writing
+				wrReg(0x11,temp);}//According to the Linux kernel driver RGB565 PCLK needs rewriting.
 			#endif
 		break;
 		#ifndef MT9D111
-		case bayerRGB:
+		case BAYER_RGB:
 			wrSensorRegs8_8(bayerRGB_ov7670);
 		break;
 		#endif
@@ -202,14 +202,14 @@ void setMT9D111res(uint16_t w,uint16_t h){
 	wrReg16(0xC8,h);
 }
 #endif
-void setRes(uint8_t res){
+void setRes(enum RESOLUTION res){
 	switch(res){
 		#ifdef MT9D111
-		case svga:
+		case SVGA:
 			setMT9D111res(800,600);
 		break;
 		#endif
-		case vga:
+		case VGA:
 			//wrReg(0x11,2);//divider
 			#ifdef ov7740
 				scalingToggle(0);
@@ -221,7 +221,7 @@ void setRes(uint8_t res){
 				wrSensorRegs8_8(vga_ov7670);
 			#endif
 		break;
-		case qvga:
+		case QVGA:
 			#ifdef ov7740
 				scalingToggle(1);
 			#elif defined MT9D111
@@ -233,7 +233,7 @@ void setRes(uint8_t res){
 				wrSensorRegs8_8(qvga_ov7670);
 			#endif
 		break;
-		case qqvga:
+		case QQVGA:
 			#ifdef ov7740
 				scalingToggle(1);
 			#elif defined MT9D111

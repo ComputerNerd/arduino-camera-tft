@@ -55,8 +55,8 @@ static void redrawGraph(void){
 #endif
 void gammaEdit(void){
 	uint16_t x,y,z;
-	setColor(rgb565);
-	setRes(qqvga);
+	setColor(RGB565);
+	setRes(QQVGA);
 	#ifdef MT9D111
 		MT9D111Refresh();
 	#endif
@@ -82,6 +82,6 @@ void gammaEdit(void){
 			tft_setDisplayDirect(DOWN2UP);
 			redrawGraph();
 		}while(z<10);
-		setRes(qvga);
+		setRes(QVGA);
 	#endif
 }

@@ -3,8 +3,8 @@
 #include <avr/pgmspace.h>
 void wrReg(uint8_t reg,uint8_t dat);
 uint8_t rdReg(uint8_t reg);
-void setRes(uint8_t res);
-void setColor(uint8_t color);
+void setRes(enum RESOLUTION res);
+void setColor(enum COLORSPACE color);
 #ifdef MT9D111
 void MT9D111Refresh(void);
 uint16_t rdReg16(uint8_t reg);

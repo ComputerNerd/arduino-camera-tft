@@ -129,12 +129,12 @@ void tft_fillRectangle(unsigned int poX, unsigned int poY, unsigned int length, 
 void tft_drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);
 void tft_drawHorizontalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);
 void tft_drawChar(unsigned char ascii,uint16_t poX, uint16_t poY,uint8_t size, uint16_t fgcolor);
-void tft_drawString(char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor);
+void tft_drawString(const char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor);
 void tft_drawStringP(const char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor);
 void tft_paintScreenBlack(void);
 void tft_drawImage(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y);
-void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y);
-void tft_drawImageVf_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y);
+void tft_drawImage_P(const uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y);
+void tft_drawImageVf_P(const uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y);
 void tft_drawCircle(int poX, int poY, int r,uint16_t color);
 void tft_fillCircle(int poX, int poY, int r,uint16_t color);
 void tft_init(void);

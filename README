@@ -1,0 +1,52 @@
+This project focuses on getting various camera modules to work quickly. Right
+now the Arduino Mega 2560 is supported and uses the Seeedstudio TFT v1.0 I may
+add more screens if I purchase another type. For camera modules it supports the
+OV7670 and mostly the MT9D111 and OV7740 coming soon. Some goals for this
+project are to support more microcontrollers and add support for more camera
+modules. This program should give people an easy way to get their camera
+modules up and running.
+
+Connections:
+
+Miscellaneous
+LED->4
+
+For OV7670:
+OV7670->Arduino Mega 2560
+SIOC->21
+SIOD->20
+VSYNC->3
+PCLK->2
+XCLK-> {convert to 3.3v} 46
+D0->37
+D1->36
+D2->35
+D3->34
+D4->33
+D5->32
+D6->31
+D7->30
+PWDN->GND
+RESET->3.3v
+Power the module with 3.3v only. 5v could cause damage.
+
+Seedstudio TFT v1.0 connections
+TFT->Arduino Mega 2560
+DO->22
+D1->23
+D2->24
+D4->26
+D5->27
+D6->28
+D7->29
+CS->10
+RS->11
+WR->12
+RD->13
+The touch pins are sequential
+Touch Y->A0
+Touch X->A1
+Touch Y+>A2
+Touch X+>A3
+This is powered with 5v. If you use 3.3v the screen will be dark. I am not sure
+if 3.3v is within the operating range for all parts on the board.

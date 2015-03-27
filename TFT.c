@@ -310,10 +310,9 @@ void tft_drawChar(unsigned char ascii,uint16_t poX, uint16_t poY,uint8_t size, u
 		}
 	}
 }
-void tft_drawString(char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor){
+void tft_drawString(const char *string,unsigned int poX, unsigned int poY,unsigned int size,unsigned int fgcolor){
 	while(*string){
-		tft_drawChar(*string, poX, poY, size, fgcolor);
-		++string;
+		tft_drawChar(*string++, poX, poY, size, fgcolor);
 		if(DisplayDirect == LEFT2RIGHT){
 			if(poX < MAX_X)
 				poX+=8*size; // Move cursor right
@@ -396,7 +395,7 @@ void tft_paintScreenBlack(void){
 	}
 	CS_HIGH;
 }
-void tft_drawImage_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
+void tft_drawImage_P(const uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 	uint16_t a,b;
 	#ifdef MEGA
 		DDRA=0xFF;
@@ -467,7 +466,7 @@ void tft_drawImage(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,uint16_t y){
 	}
 	tft_setDisplayDirect(DOWN2UP);
 }
-void tft_drawImageVf_P(uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y){
+void tft_drawImageVf_P(const uint8_t * dat,uint16_t w,uint16_t h,uint16_t x,int16_t y){
 	uint16_t a;
 	int16_t b;
 	#ifdef MEGA

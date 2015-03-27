@@ -21,7 +21,6 @@ static inline uint16_t readADC(uint8_t mux){
 	return silly;
 }
 void getPoint(uint16_t * x,uint16_t * y,uint16_t * pressure){
-waiting:
 	//YM A0 XM A1 YP A2 XP A3
 	DDRF&=~(1|(1<<2));//set YP and YM to input
 	PORTF&=~(1|(1<<2));//set YP and YM to low
@@ -32,7 +31,6 @@ waiting:
 	if(*x!=readADC(2)){
 		*pressure=0;
 		return;
-		//goto waiting;
 	}
 	*x=1023-*x;
 	DDRF&=~((1<<1)|(1<<3));//set both xm and xp to input
@@ -44,7 +42,6 @@ waiting:
 	if(*y!=readADC(1)){
 		*pressure=0;
 		return;
-		//goto waiting;
 	}
 	*y=1023-*y;
 	// Set X+ to ground
@@ -63,13 +60,13 @@ waiting:
 	uint16_t z1 = readADC(1);//read XM 
 	uint16_t z2 = readADC(2);//read YP
 	/*float rtouch;
-     rtouch = z2;
-     rtouch /= z1;
-     rtouch -= 1;
-     rtouch *= x;
-     rtouch *= _rxplate;
-     rtouch /= 1024;
-     z = rtouch;*/
+	rtouch = z2;
+	rtouch /= z1;
+	rtouch -= 1;
+	rtouch *= x;
+	rtouch *= _rxplate;
+	rtouch /= 1024;
+	z = rtouch;*/
 	float rtouch=(float)z2;
 	rtouch/=(float)z1;
 	rtouch-=1.0f;

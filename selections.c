@@ -1,18 +1,22 @@
+#include <stdlib.h>
+#include <avr/pgmspace.h>
+#include "config.h"
+#include <util/delay.h>
 #include "TFT.h"
 #include "TouchScreen.h"
 #include "twicam.h"
 #include "camregdef.h"
-#include "config.h"
 #include "MT9D111_regs.h"
 #include "captureimage.h"
 #include "twicam.h"
 #include "gammaedit.h"
-#include <avr/pgmspace.h>
-#include <util/delay.h>
+#include "regedit.h"
+#ifdef haveSDcard
 #include "mmc.h"
+#endif
 #include "filebrowser.h"
 #include "exiticon.h"
-#ifndef MT9D11
+#ifndef MT9D111
 static void setmatrix(uint8_t id){
 	switch (id) {
 		case 0:
@@ -63,7 +67,7 @@ const char menu1[] PROGMEM = "Pick a matrix";
 #endif
 const char menu2[] PROGMEM = "Reset Reg";
 const char menu3[] PROGMEM = "Compare Matrix";
-const char menu4[] PROGMEM = "qqvga preview";
+const char menu4[] PROGMEM = "QQVGA preview";
 #ifndef MT9D111
 const char menu5[] PROGMEM = "gamma edit";
 #else
@@ -90,9 +94,9 @@ const char *const menu_tablep2[] PROGMEM = {
 	menup20,menup21,menup22
 };
 #ifdef ov7670
-const char maxtrix0[] PROGMEM = "Matrix yuv422";
+const char maxtrix0[] PROGMEM = "Matrix YUV422";
 const char maxtrix1[] PROGMEM = "Matrix 2";
-const char maxtrix2[] PROGMEM = "Matrix rgb565";
+const char maxtrix2[] PROGMEM = "Matrix RGB565";
 const char *const maxtrix_table[] PROGMEM = {maxtrix0,maxtrix1,maxtrix2};
 #elif defined ov7740
 const char maxtrix0[] PROGMEM = "Matrix off";
@@ -209,20 +213,20 @@ void menu(void){
 		switch (selection((const char**)menu_table,10)){
 			case 0:
 			#ifdef MT9D111
-				setRes(qvga);
-				setColor(rgb565);
+				setRes(QVGA);
+				setColor(RGB565);
 				MT9D111Refresh();
 				editRegs(0);
 			#else
-				setColor(rgb565);
-				setRes(qvga);
+				setColor(RGB565);
+				setRes(QVGA);
 				editRegs();
 			#endif
 		break;
 		case 1:
 			#ifdef MT9D111
-				setRes(qvga);
-				setColor(rgb565);
+				setRes(QVGA);
+				setColor(RGB565);
 				MT9D111Refresh();
 				editRegs(1);
 			#else
@@ -263,8 +267,8 @@ void menu(void){
 		break;
 		#endif
 			case 4:
-				setColor(rgb565);
-				setRes(qqvga);
+				setColor(RGB565);
+				setRes(QQVGA);
 				#ifdef MT9D111
 					MT9D111Refresh();
 				#endif
@@ -274,18 +278,23 @@ void menu(void){
 					capImgqqvga(160);
 					tft_setDisplayDirect(DOWN2UP);
 				}while(z<10);
-				setRes(qvga);
+				setRes(QVGA);
 			break;
 			case 5:
 				#ifdef ov7670
-					setColor(rgb565);
+					setColor(RGB565);
 				#endif
 				gammaEdit();
 			break;
 			case 6:
 				//File browser
 				//start by listing files
-				browserSD();
+				#ifdef haveSDcard
+					browserSD();
+				#else
+					tft_drawStringP(PSTR("No SD card"),16,320,3,WHITE);
+					_delay_ms(666);
+				#endif
 			break;
 			case 7:
 				#ifdef ov7670
@@ -315,8 +324,8 @@ void menu(void){
 					}
 				}
 				tft_setOrientation(1);
-				setRes(qvga);
-				setColor(rgb565);
+				setRes(QVGA);
+				setColor(RGB565);
 				capImg();
 				tft_setDisplayDirect(DOWN2UP);}
 				#endif
@@ -334,7 +343,7 @@ void menu(void){
 				#ifdef MT9D111
 					wrReg16(0xF0,2);//page 2
 					wrReg16(0x0D,0);
-					setColor(yuv422);
+					setColor(YUV422);
 				#endif
 				switch(reso){
 					case 0:
@@ -347,15 +356,15 @@ void menu(void){
 					break;
 					case 1:
 						#ifdef MT9D111
-							setRes(svga);
+							setRes(SVGA);
 						#else
-							setRes(qvga);
-							setColor(yuv422);
+							setRes(QVGA);
+							setColor(YUV422);
 						#endif
 					break;
 					#ifdef MT9D111
 					case 2:
-						setRes(qvga);
+						setRes(QVGA);
 					break;
 					#endif
 					default:
@@ -469,6 +478,7 @@ theEnd:
 							}while(rdReg16(0xC8)<4);
 							waitStateMT9D111(3);*/
 						#endif
+						#ifdef haveSDcard
 						{
 							char buf[24];
 							uint16_t imgc=0;
@@ -540,6 +550,10 @@ theEnd:
 								MT9D111DoPreview();
 							#endif
 						}
+						#else
+							tft_drawStringP(PSTR("No SD card"),16,320,3,WHITE);
+							_delay_ms(666);
+						#endif
 					break;
 					case 2:
 						//previous page

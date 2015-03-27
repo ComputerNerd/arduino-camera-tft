@@ -1,3 +1,5 @@
+#include "config.h"
+#ifdef haveSDcard
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 #include "TFT.h"
@@ -7,7 +9,6 @@
 #include "unknownfile.h"
 #include "ff.h"
 #include "exiticon.h"
-#include "config.h"
 #include "tjpgd.h"
 static void drawstrpart(char * str,uint8_t amount,uint16_t x,uint8_t y){
 	uint8_t z;
@@ -115,9 +116,9 @@ static uint8_t skipFiles(DIR * Dir,uint16_t amount){
 	}
 	return 0;
 }
-FIL File;
+static FIL File;
 // User defined call-back function to input JPEG data
-UINT tjd_input (
+static UINT tjd_input (
 	JDEC* jd,		// Decompression object
 	BYTE* buff,		// Pointer to the read buffer (NULL:skip)
 	UINT nd			// Number of bytes to read/skip from input stream
@@ -139,7 +140,7 @@ UINT tjd_input (
 
 
 // User defined call-back function to output RGB bitmap
-UINT tjd_output (
+static UINT tjd_output (
 	JDEC* jd,		// Decompression object of current session
 	void* bitmap,	// Bitmap data to be output
 	JRECT* rect		// Rectangular region to output
@@ -389,3 +390,4 @@ void browserSD(void){
 	}
 	f_closedir(&Dir);
 }
+#endif

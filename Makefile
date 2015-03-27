@@ -85,7 +85,7 @@ PROJECTNAME=cameratft
 # (list all files to compile, e.g. 'a.c b.cpp as.S'):
 # Use .cc, .cpp or .C suffix for C++ files, use .S 
 # (NOT .s !!!) for assembly source code files.
-PRJSRC=main.c font.c twicam.c TFT.c TouchScreen.c captureimage.c gammaedit.c selections.c MT9D111_regs.c ff.c mmc.c filebrowser.c exiticon.c tjpgd.c
+PRJSRC=main.c font.c twicam.c TFT.c TouchScreen.c captureimage.c gammaedit.c selections.c MT9D111_regs.c ff.c mmc.c filebrowser.c exiticon.c tjpgd.c regedit.c
 
 # additional includes (e.g. -I/path/to/mydir)
 INC=
@@ -137,29 +137,21 @@ AVRDUDE_PORT=/dev/ttyACM0
 HEXFORMAT=ihex
 
 # compiler
-CFLAGS=-pipe -fomit-frame-pointer -mrelax -flto -g -I. $(INC)  -mmcu=$(MCU) -O$(OPTLEVEL) \
-	-fpack-struct -fshort-enums             \
-	-funsigned-bitfields -funsigned-char    \
-	-Wall -Wstrict-prototypes               \
-	-Wa,-ahlms=$(firstword                  \
-	$(filter %.lst, $(<:.c=.lst)))
+CFLAGS=-pipe -flto -fuse-linker-plugin -mrelax -fomit-frame-pointer -g -I. $(INC) -mmcu=$(MCU) -O$(OPTLEVEL) \
+	-fpack-struct -fshort-enums \
+	-funsigned-bitfields -funsigned-char \
+	-Wall -Wstrict-prototypes
 
 # c++ specific flags
-CPPFLAGS=-fno-exceptions               \
-	-Wa,-ahlms=$(firstword         \
-	$(filter %.lst, $(<:.cpp=.lst))\
-	$(filter %.lst, $(<:.cc=.lst)) \
-	$(filter %.lst, $(<:.C=.lst)))
+CPPFLAGS=-fno-exceptions
 
 # assembler
 ASMFLAGS =-I. $(INC) -mmcu=$(MCU)        \
-	-x assembler-with-cpp            \
-	-Wa,-gstabs,-ahlms=$(firstword   \
-		$(<:.S=.lst) $(<.s=.lst))
+	-x assembler-with-cpp
 
 
 # linker
-LDFLAGS=$(CFLAGS) -Wl,-gc-sections,-Map,$(TRG).map -flto -mmcu=$(MCU) \
+LDFLAGS=$(CFLAGS) -Wl,-gc-sections,-Map,$(TRG).map -mmcu=$(MCU) \
 	-lm $(LIBS)
 
 ##### executables ####

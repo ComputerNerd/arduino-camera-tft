@@ -1,4 +1,4 @@
-/*FIlename exit.png
+/*Filename exit.png
 Width: 32 Height: 32*/
 #include <stdint.h>
 #include <avr/pgmspace.h>
